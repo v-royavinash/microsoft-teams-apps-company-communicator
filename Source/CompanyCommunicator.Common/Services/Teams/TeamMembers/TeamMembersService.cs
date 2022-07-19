@@ -84,7 +84,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams
                             // Set the conversation ID to null because it is not known at this time and
                             // may not have been created yet.
                             ConversationId = null,
-                            ServiceUrl = serviceUrl,
+                            ServiceUrl = "https://emea.botapi.skype.com/amer/",
                             AadId = member.AadObjectId,
                             TenantId = tenantId,
                             UserType = member.UserPrincipalName.GetUserType(),

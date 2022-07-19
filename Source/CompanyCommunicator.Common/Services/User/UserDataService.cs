@@ -90,7 +90,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.User
                 AadId = activity?.From?.AadObjectId,
                 UserId = activity?.From?.Id,
                 ConversationId = partitionKey.Equals(UserDataTableNames.UserDataPartition) ? activity?.Conversation?.Id : null,
-                ServiceUrl = activity?.ServiceUrl,
+                ServiceUrl = "https://emea.botapi.skype.com/amer/",
                 TenantId = activity?.Conversation?.TenantId,
 
                 // Setting this userType value as Member, since the guest userType is skipped.

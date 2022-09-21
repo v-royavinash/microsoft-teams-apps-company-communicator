@@ -1,7 +1,7 @@
 # Stage 1 : Define the base image
 # This will setup the image that will be used for production(aliased as "base") and
 # install node js.
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -13,7 +13,7 @@ RUN apt-get update -yq \
 # Stage 2: Build and publish the code
 # Uses an sdk image(aliased as "build"), installs node js, copies our project code into a working
 # directory, restores Nuget packages, builds the code and publishes it to a directory names publish.
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:6.0-buster AS build
 RUN apt-get update -yq \
     && apt-get install curl gnupg -yq \
     && curl -sL https://deb.nodesource.com/setup_10.x | bash \

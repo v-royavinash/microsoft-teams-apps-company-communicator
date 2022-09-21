@@ -1,13 +1,13 @@
 # Stage 1 : Define the base image
 # This will setup the image that will be used for production(aliased as "base").
-FROM mcr.microsoft.com/azure-functions/dotnet:3.0 AS base
+FROM mcr.microsoft.com/azure-functions/dotnet:6.0 AS base
 WORKDIR /home/site/wwwroot
 EXPOSE 80
 
 # Stage 2: Build and publish the code
 # Uses an sdk image(aliased as "build"), copies our project code into a working directory,
 # restores Nuget packages, builds the code and publishes it to a directory names publish.
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:6.0-buster AS build
 WORKDIR /src
 COPY ["Microsoft.Teams.Apps.CompanyCommunicator.Send.Func/Microsoft.Teams.Apps.CompanyCommunicator.Send.Func.csproj", "Microsoft.Teams.Apps.CompanyCommunicator.Send.Func/"]
 COPY ["Microsoft.Teams.Apps.CompanyCommunicator.Common/Microsoft.Teams.Apps.CompanyCommunicator.Common.csproj", "Microsoft.Teams.Apps.CompanyCommunicator.Common/"]

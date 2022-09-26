@@ -72,6 +72,133 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
         public void ConfigureServices(IServiceCollection services)
         {
             // Add all options set from configuration values.
+            services.AddOptions<AuthenticationOptions>()
+                .Configure<IConfiguration>((authenticationOptions, configuration) =>
+                {
+                    Startup.FillAuthenticationOptionsProperties(authenticationOptions, configuration);
+                });
+            services.AddOptions<BotOptions>()
+                .Configure<IConfiguration>((botOptions, configuration) =>
+                {
+                    botOptions.UserAppId = configuration.GetValue<string>("UserAppId");
+                    botOptions.UserAppPassword = configuration.GetValue<string>("UserAppPassword", string.Empty);
+                    botOptions.AuthorAppId = configuration.GetValue<string>("AuthorAppId");
+                    botOptions.AuthorAppPassword = configuration.GetValue<string>("AuthorAppPassword", string.Empty);
+                    botOptions.UseCertificate = configuration.GetValue<bool>("UseCertificate", false);
+                    botOptions.AuthorAppCertName = configuration.GetValue<string>("AuthorAppCertName", string.Empty);
+                    botOptions.UserAppCertName = configuration.GetValue<string>("UserAppCertName", string.Empty);
+                    botOptions.GraphAppId = configuration.GetValue<string>("GraphAppId");
+                    botOptions.GraphAppCertName = configuration.GetValue<string>("GraphAppCertName", string.Empty);
+                });
+            services.AddOptions<BotFilterMiddlewareOptions>()
+                .Configure<IConfiguration>((botFilterMiddlewareOptions, configuration) =>
+                {
+                    botFilterMiddlewareOptions.DisableTenantFilter =
+                        configuration.GetValue<bool>("DisableTenantFilter", false);
+                    botFilterMiddlewareOptions.AllowedTenants =
+                        configuration.GetValue<string>("AllowedTenants");
+                });
+            services.AddOptions<RepositoryOptions>()
+                .Configure<IConfiguration>((repositoryOptions, configuration) =>
+                {
+                    repositoryOptions.StorageAccountConnectionString =
+                        configuration.GetValue<string>("StorageAccountConnectionString");
+
+                    // Setting this to true because the main application should ensure that all
+                    // tables exist.
+                    repositoryOptions.EnsureTableExists = true;
+                });
+            services.AddOptions<DataQueueMessageOptions>()
+                .Configure<IConfiguration>((dataQueueMessageOptions, configuration) =>
+                {
+                    dataQueueMessageOptions.ForceCompleteMessageDelayInSeconds =
+                        configuration.GetValue<double>("ForceCompleteMessageDelayInSeconds", 86400);
+                });
+
+            services.AddOptions<UserAppOptions>()
+                .Configure<IConfiguration>((options, configuration) =>
+                {
+                    options.ProactivelyInstallUserApp =
+                        configuration.GetValue<bool>("ProactivelyInstallUserApp", true);
+
+                    options.UserAppExternalId =
+                        configuration.GetValue<string>("UserAppExternalId", "148a66bb-e83d-425a-927d-09f4299a9274");
+                });
+
+            services.AddOptions();
+
+            // Add localization services.
+            services.AddLocalizationSettings(this.Configuration);
+
+            // Add authentication services.
+            AuthenticationOptions authenticationOptionsParameter = new AuthenticationOptions();
+            Startup.FillAuthenticationOptionsProperties(authenticationOptionsParameter, this.Configuration);
+            services.AddAuthentication(this.Configuration, authenticationOptionsParameter);
+            services.AddControllersWithViews();
+
+            // Setup SPA static files.
+            // In production, the React files will be served from this directory.
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
+
+            var useManagedIdentity = this.Configuration.GetValue<bool>("UseManagedIdentity");
+            services.AddBlobClient(useManagedIdentity);
+            services.AddServiceBusClient(useManagedIdentity);
+
+            // The bot needs an HttpClient to download and upload files.
+            services.AddHttpClient();
+
+            // Add bot services.
+            services.AddTransient<TeamsDataCapture>();
+            services.AddTransient<TeamsFileUpload>();
+            services.AddTransient<UserTeamsActivityHandler>();
+            services.AddTransient<AuthorTeamsActivityHandler>();
+            services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
+            services.AddTransient<CompanyCommunicatorBotFilterMiddleware>();
+            services.AddSingleton<CompanyCommunicatorBotAdapter>();
+            services.AddSingleton<BotFrameworkHttpAdapter>();
+
+            // Add repositories.
+            services.AddSingleton<ITeamDataRepository, TeamDataRepository>();
+            services.AddSingleton<IUserDataRepository, UserDataRepository>();
+            services.AddSingleton<ISentNotificationDataRepository, SentNotificationDataRepository>();
+            services.AddSingleton<INotificationDataRepository, NotificationDataRepository>();
+            services.AddSingleton<IExportDataRepository, ExportDataRepository>();
+            services.AddSingleton<IAppConfigRepository, AppConfigRepository>();
+            services.AddSingleton<ISendingNotificationDataRepository, SendingNotificationDataRepository>();
+
+            // Add service bus message queues.
+            services.AddSingleton<IPrepareToSendQueue, PrepareToSendQueue>();
+            services.AddSingleton<IDataQueue, DataQueue>();
+            services.AddSingleton<IExportQueue, ExportQueue>();
+
+            // Add draft notification preview services.
+            services.AddSingleton<IDraftNotificationPreviewService, DraftNotificationPreviewService>();
+
+            string keyVaultUrl = this.Configuration.GetValue<string>("KeyVault:Url");
+            services.AddSecretsProvider(keyVaultUrl);
+
+            // Add microsoft graph services.
+            services.AddScoped<IAuthenticationProvider, GraphTokenProvider>();
+            services.AddScoped<IGraphServiceClient, GraphServiceClient>();
+            services.AddScoped<IGraphServiceFactory, GraphServiceFactory>();
+            services.AddScoped<IGroupsService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetGroupsService());
+            services.AddScoped<IAppCatalogService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetAppCatalogService());
+
+            // Add Application Insights telemetry.
+            services.AddApplicationInsightsTelemetry();
+
+            // Add miscellaneous dependencies.
+            services.AddTransient<TableRowKeyGenerator>();
+            services.AddTransient<AdaptiveCardCreator>();
+            services.AddTransient<IAppSettingsService, AppSettingsService>();
+            services.AddTransient<IUserDataService, UserDataService>();
+            services.AddTransient<ITeamMembersService, TeamMembersService>();
+            services.AddTransient<ICCBotFrameworkHttpAdapter, CCBotFrameworkHttpAdapter>();
+            services.AddTransient<IStorageClientFactory, StorageClientFactory>();
+            services.AddTransient<IBlobStorageProvider, BlobStorageProvider>();
             services.AddRazorPages();
 
 

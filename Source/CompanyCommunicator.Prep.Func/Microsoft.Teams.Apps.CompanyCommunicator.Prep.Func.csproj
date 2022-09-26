@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
 	<TargetFramework>net6.0</TargetFramework>
-	<IdentityUIFrameworkVersion>Bootstrap4</IdentityUIFrameworkVersion>
+	<IdentityUIFrameworkVersion>Bootstrap5</IdentityUIFrameworkVersion>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DockerFastModeProjectMountDirectory>/home/site/wwwroot</DockerFastModeProjectMountDirectory>

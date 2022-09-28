@@ -564,14 +564,21 @@
         "dailyMemoryTimeQuota": 0,
         "httpsOnly": true,
         "siteConfig": {
-          "ftpsState": "Disabled",
           "alwaysOn": "[not(variables('isSharedPlan'))]",
           "cors": {
             "supportCredentials": true,
             "allowedOrigins": [
               "[concat('https://', variables('frontDoorDomain'))]"
             ]
-          }
+          },
+          "ftpsState": "Disabled",
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "dotnet"
+            }
+          ],
+          "netFrameworkVersion": "v6.0.400"
         }
       },
       "dependsOn": [
@@ -710,7 +717,7 @@
             "KeyVault:Url": "[variables('keyVaultUrl')]",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('StorageAccountSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "FUNCTIONS_EXTENSION_VERSION": "~6",
+            "FUNCTIONS_EXTENSION_VERSION": "~3",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "WEBSITE_CONTENTSHARE": "[toLower(variables('prepFunctionAppName'))]",
@@ -793,7 +800,7 @@
             "KeyVault:Url": "[variables('keyVaultUrl')]",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('StorageAccountSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "FUNCTIONS_EXTENSION_VERSION": "~6",
+            "FUNCTIONS_EXTENSION_VERSION": "~3",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "WEBSITE_CONTENTSHARE": "[toLower(variables('sendFunctionAppName'))]",
@@ -875,7 +882,7 @@
             "KeyVault:Url": "[variables('keyVaultUrl')]",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('StorageAccountSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "FUNCTIONS_EXTENSION_VERSION": "~6",
+            "FUNCTIONS_EXTENSION_VERSION": "~3",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "WEBSITE_CONTENTSHARE": "[toLower(variables('dataFunctionAppName'))]",

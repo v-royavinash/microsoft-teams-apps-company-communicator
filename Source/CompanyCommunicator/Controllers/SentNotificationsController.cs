@@ -1,4 +1,4 @@
-﻿// <copyright file="SentNotificationsController.cs" company="Microsoft">
+// <copyright file="SentNotificationsController.cs" company="Microsoft">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>
@@ -180,6 +180,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     TotalMessageCount = notificationEntity.TotalMessageCount,
                     SendingStartedDate = notificationEntity.SendingStartedDate,
                     Status = notificationEntity.GetStatus(),
+                    CreatedBy = notificationEntity.CreatedBy,
                 };
 
                 result.Add(summary);
@@ -242,6 +243,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 WarningMessage = notificationEntity.WarningMessage,
                 CanDownload = userNotificationDownload == null,
                 SendingCompleted = notificationEntity.IsCompleted(),
+                CreatedBy = notificationEntity.CreatedBy,
             };
 
             // In case we have blob name instead of URL to public image.

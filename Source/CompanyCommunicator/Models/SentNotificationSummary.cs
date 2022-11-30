@@ -1,4 +1,4 @@
-﻿// <copyright file="SentNotificationSummary.cs" company="Microsoft">
+// <copyright file="SentNotificationSummary.cs" company="Microsoft">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>
@@ -67,5 +67,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets notification status. <see cref="NotificationStatus"/> for possible values.
         /// </summary>
         public string Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets created by value.
+        /// </summary>
+        public string CreatedBy { get; set; }
     }
 }

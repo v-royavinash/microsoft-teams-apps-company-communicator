@@ -1,4 +1,4 @@
-// <copyright file="SentNotification.cs" company="Microsoft">
+﻿// <copyright file="SentNotification.cs" company="Microsoft">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>

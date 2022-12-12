@@ -64,7 +64,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func.Services.FileCardSe
             var user = await this.userDataRepository.GetAsync(UserDataTableNames.AuthorDataPartition, userId);
             if (user == null)
             {
-                await this.userDataRepository.GetAsync(UserDataTableNames.UserDataPartition, userId);
+                user = await this.userDataRepository.GetAsync(UserDataTableNames.UserDataPartition, userId);
             }
 
             var conversationReference = new ConversationReference

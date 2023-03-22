@@ -108,16 +108,16 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func
             builder.Services.AddServiceBusClient(useManagedIdentity);
 
             // Set current culture.
-            var culture = Environment.GetEnvironmentVariable("i18n:DefaultCulture");
+            var culture = "En-US";
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(culture);
             CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(culture);
 
             // Add bot services.
             builder.Services.AddSingleton<UserAppCredentials>();
             builder.Services.AddSingleton<AuthorAppCredentials>();
-            builder.Services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
-            builder.Services.AddSingleton<ICCBotFrameworkHttpAdapter, CCBotFrameworkHttpAdapter>();
-            builder.Services.AddSingleton<BotFrameworkHttpAdapter>();
+            builder.Services.AddSingleton<ServiceClientCredentialsFactory, ConfigurationCredentialProvider>();
+            builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
+            builder.Services.AddSingleton<CCBotAdapterBase, CCBotAdapter>();
 
             // Add repositories.
             builder.Services.AddSingleton<INotificationDataRepository, NotificationDataRepository>();
@@ -167,6 +167,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func
             builder.Services.AddOptions<ConfidentialClientApplicationOptions>().
                 Configure<IConfiguration>((confidentialClientApplicationOptions, configuration) =>
                 {
+                    confidentialClientApplicationOptions.AzureCloudInstance = AzureCloudInstance.AzureUsGovernment;
                     confidentialClientApplicationOptions.ClientId = configuration.GetValue<string>("GraphAppId");
                     confidentialClientApplicationOptions.ClientSecret = configuration.GetValue<string>("GraphAppPassword", string.Empty);
                     confidentialClientApplicationOptions.TenantId = configuration.GetValue<string>("TenantId");
@@ -182,7 +183,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func
             // Add Graph Clients.
             builder.Services.AddSingleton<IGraphServiceClient>(
                 serviceProvider =>
-                new GraphServiceClient(serviceProvider.GetRequiredService<IAuthenticationProvider>()));
+                new GraphServiceClient("https://graph.microsoft.us/v1.0", serviceProvider.GetRequiredService<IAuthenticationProvider>()));
 
             // Add Service Factory
             builder.Services.AddSingleton<IGraphServiceFactory, GraphServiceFactory>();

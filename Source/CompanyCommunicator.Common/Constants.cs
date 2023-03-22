@@ -63,7 +63,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common
         /// <summary>
         /// get the default graph scope.
         /// </summary>
-        public const string ScopeDefault = "https://graph.microsoft.com/.default";
+        public const string ScopeDefault = "https://graph.microsoft.us/.default";
 
         /// <summary>
         /// get the OData next page link.

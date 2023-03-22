@@ -19,7 +19,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
     /// </summary>
     internal class UsersService : IUsersService
     {
-        private const string TeamsLicenseId = "57ff2da0-773e-42df-b2af-ffb7a2317929";
+        private const string TeamsLicenseId = "9953b155-8aef-4c56-92f3-72b0487fce41";
 
         private readonly IGraphServiceClient graphServiceClient;
 
@@ -256,7 +256,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
                 }
 
                 var filterUserIds = this.GetUserIdFilter(userIds);
-                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.com/v1.0/users?$filter={filterUserIds}&$select=id,displayName,userPrincipalName,userType");
+                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, $"https://graph.microsoft.us/v1.0/users?$filter={filterUserIds}&$select=id,displayName,userPrincipalName,userType");
                 batchRequestContent.AddBatchRequestStep(new BatchRequestStep(requestId.ToString(), httpRequestMessage));
 
                 if (batchRequestContent.BatchRequestSteps.Count() % maxNoBatchItems == 0)

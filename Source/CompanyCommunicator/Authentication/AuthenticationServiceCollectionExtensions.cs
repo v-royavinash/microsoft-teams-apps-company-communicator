@@ -89,6 +89,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Authentication
                  confidentialClientApplicationOptions =>
                  {
                      configuration.Bind("AzureAd", confidentialClientApplicationOptions);
+                     confidentialClientApplicationOptions.AzureCloudInstance = Identity.Client.AzureCloudInstance.AzureUsGovernment;
                  })
                  .AddInMemoryTokenCaches();
         }

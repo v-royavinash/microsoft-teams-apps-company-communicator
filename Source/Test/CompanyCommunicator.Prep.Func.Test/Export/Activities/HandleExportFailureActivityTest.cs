@@ -36,7 +36,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
         private readonly Mock<IStorageClientFactory> storageClientFactory = new Mock<IStorageClientFactory>();
         private readonly Mock<IUserDataRepository> userDataRepository = new Mock<IUserDataRepository>();
         private readonly Mock<IOptions<BotOptions>> botOptions = new Mock<IOptions<BotOptions>>();
-        private readonly Mock<ICCBotFrameworkHttpAdapter> botAdapter = new Mock<ICCBotFrameworkHttpAdapter>();
+        private readonly Mock<CCBotAdapterBase> botAdapter = new Mock<CCBotAdapterBase>();
         private readonly Mock<IStringLocalizer<Strings>> localizer = new Mock<IStringLocalizer<Strings>>();
         private readonly Mock<BlobContainerClient> blobContainerClient = new Mock<BlobContainerClient>();
 

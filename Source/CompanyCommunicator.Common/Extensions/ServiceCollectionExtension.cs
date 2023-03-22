@@ -94,7 +94,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions
                     return ConfidentialClientApplicationBuilder
                         .Create(options.Value.ClientId)
                         .WithCertificate(cert)
-                        .WithAuthority(new Uri($"https://login.microsoftonline.com/{options.Value.TenantId}"))
+                        .WithAuthority(new Uri($"https://login.microsoftonline.us/{options.Value.TenantId}"))
                         .Build();
                 });
             }
@@ -106,7 +106,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions
                     return ConfidentialClientApplicationBuilder
                         .Create(options.Value.ClientId)
                         .WithClientSecret(options.Value.ClientSecret)
-                        .WithAuthority(new Uri($"https://login.microsoftonline.com/{options.Value.TenantId}"))
+                        .WithAuthority(new Uri($"https://login.microsoftonline.us/{options.Value.TenantId}"))
                         .Build();
                 });
             }

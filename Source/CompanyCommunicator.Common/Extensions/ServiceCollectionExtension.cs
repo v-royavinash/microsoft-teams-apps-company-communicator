@@ -136,8 +136,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions
                 case TeamsEnvironment.GCC:
                     return AzureCloudInstance.AzurePublic;
                 case TeamsEnvironment.GCCH:
-                case TeamsEnvironment.DOD:
-                    return AzureCloudInstance.AzureUsGovernment;
                 default:
                     return AzureCloudInstance.AzurePublic;
             }

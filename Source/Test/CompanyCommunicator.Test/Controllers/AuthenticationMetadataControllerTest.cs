@@ -47,7 +47,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Test.Controllers
         {
             // Arrange
             this.options.Setup(x => x.Value).Returns(new AuthenticationOptions() { AzureAdTenantId = this.tenantId, AzureAdClientId = this.clientId });
-            Action action = () => new AuthenticationMetadataController(this.options.Object);
+            Action action = () => new AuthenticationMetadataController(this.options.Object, null /*TODO - fix this*/);
 
             // Act and Assert.
             action.Should().NotThrow();
@@ -60,7 +60,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Test.Controllers
         public void CreateInstance_NullParameter_ThrowsArgumentNullException()
         {
             // Arrange
-            Action action = () => new AuthenticationMetadataController(null /*authenticationOptions*/);
+            Action action = () => new AuthenticationMetadataController(null /*authenticationOptions*/, null);
 
             // Act and Assert.
             action.Should().Throw<ArgumentNullException>("authenticationOptions is null.");
@@ -201,7 +201,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Test.Controllers
         public AuthenticationMetadataController GetAuthenticationMetadataController()
         {
             this.options.Setup(x => x.Value).Returns(new AuthenticationOptions() { AzureAdTenantId = this.tenantId, AzureAdClientId = this.clientId });
-            return new AuthenticationMetadataController(this.options.Object);
+            return new AuthenticationMetadataController(this.options.Object, null/*TODO - fix this*/);
         }
 
         private List<string> GetComponents()

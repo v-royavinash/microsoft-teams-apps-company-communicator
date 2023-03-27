@@ -29,7 +29,7 @@ namespace Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Microsoft
         {
             // Arrange
             Mock<IGraphServiceClient> graphServiceClientMock = new Mock<IGraphServiceClient>();
-            Action action = () => new UsersService(graphServiceClientMock.Object);
+            Action action = () => new UsersService(graphServiceClientMock.Object, null/*TODO - fix this*/);
 
             // Act and Assert.
             action.Should().NotThrow();
@@ -42,7 +42,7 @@ namespace Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Microsoft
         public void CreateInstance_NullParameters_ThrowsArgumentNullException()
         {
             // Arrange
-            Action action = () => new UsersService(null);
+            Action action = () => new UsersService(null, null);
 
             // Act and Assert.
             action.Should().Throw<ArgumentNullException>();
@@ -211,7 +211,7 @@ namespace Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Microsoft
             });
 
             GraphServiceClient client = new GraphServiceClient(new MockAuthenticationHelper(), mockHttpProvider);
-            return new UsersService(client);
+            return new UsersService(client, null/*TODO - fix this*/);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
     public class SendFileCardActivityTest
     {
         private readonly Mock<IOptions<BotOptions>> botOptions = new Mock<IOptions<BotOptions>>();
-        private readonly Mock<ICCBotFrameworkHttpAdapter> botAdapter = new Mock<ICCBotFrameworkHttpAdapter>();
+        private readonly Mock<CCBotAdapterBase> botAdapter = new Mock<CCBotAdapterBase>();
         private readonly Mock<IUserDataRepository> userDataRepository = new Mock<IUserDataRepository>();
         private readonly Mock<IConversationService> conversationService = new Mock<IConversationService>();
         private readonly Mock<IOptions<TeamsConversationOptions>> options = new Mock<IOptions<TeamsConversationOptions>>();

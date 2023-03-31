@@ -33,7 +33,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGrap
         /// <inheritdoc/>
         public IUsersService GetUsersService()
         {
-            return new UsersService(this.serviceClient, null/*TODO - fix this*/);
+            return new UsersService(this.serviceClient, this.appConfiguration);
         }
 
         /// <inheritdoc/>

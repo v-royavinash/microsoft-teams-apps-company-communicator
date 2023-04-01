@@ -1381,9 +1381,10 @@
         },
         "enabledState": "Enabled",
         "friendlyName": "[variables('frontDoorName')]",
-        "resourceState": "Enabled",
-        "condition": "[variables('useFrontDoor')]"
-      }
+        "resourceState": "Enabled"
+
+      },
+      "condition": "[variables('useFrontDoor')]"
     }
   ],
   "outputs": {

@@ -295,7 +295,7 @@
     "skuFamily": "[if(equals(parameters('hostingPlanSku'), 'Shared'), 'D', take(parameters('hostingPlanSku'), 1))]",
     "useFrontDoor": "[equals(parameters('customDomainOption'), 'Azure Front Door')]",
     "frontDoorName": "[parameters('baseResourceName')]",
-    "frontDoorDomain": "[toLower(concat(variables('frontDoorName'), '.azurefd.net'))]",
+    "frontDoorDomain": "[toLower(concat(variables('frontDoorName'), '.azurefd.us'))]",
     "ProactivelyInstallUserApp": "[parameters('ProactivelyInstallUserApp')]",
     "UserAppExternalId": "[parameters('UserAppExternalId')]",
     "i18n:DefaultCulture": "[parameters('DefaultCulture')]",
@@ -327,7 +327,10 @@
     "ToBotFromChannelTokenIssuer": "https://api.botframework.us",
     "ToBotFromEmulatorOpenIdMetadataUrl": "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/.well-known/openid-configuration",
     "ToChannelFromBotLoginUrl": "https://login.microsoftonline.us/MicrosoftServices.onmicrosoft.us",
-    "ToChannelFromBotOAuthScope": "https://api.botframework.us"
+    "ToChannelFromBotOAuthScope": "https://api.botframework.us",
+    "Instance": "https://login.microsoftonline.us/",
+    "ValidIssuers": "https://login.microsoftonline.us/TENANT_ID/v2.0,https://sts.windows.net/TENANT_ID/"
+
   },
   "resources": [
     {
@@ -580,7 +583,7 @@
           "cors": {
             "supportCredentials": true,
             "allowedOrigins": [
-              "[concat('https://', variables('botAppDomain'))]"
+              "[concat('https://', variables('frontDoorDomain'))]"
             ]
           },
           "metadata": [
@@ -622,7 +625,9 @@
             "AzureAd:TenantId": "[parameters('tenantId')]",
             "AzureAd:ClientId": "[parameters('graphAppId')]",
             "AzureAd:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('GraphAppSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "AzureAd:ApplicationIdURI": "[concat('api://', variables('botAppDomain'))]",
+            "AzureAd:ApplicationIdURI": "[if(variables('useFrontDoor'), concat('api://', variables('frontDoorDomain')), '')]",
+            "AzureAd:Instance": "[variables('Instance')]",
+            "AzureAd:ValidIssuers": "[variables('ValidIssuers')]",
             "UserAppId": "[parameters('userClientId')]",
             "UserAppPassword": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('UserAppSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
             "AuthorAppId": "[parameters('authorClientId')]",
@@ -653,10 +658,11 @@
             "GraphBaseUrl": "[variables('GraphBaseUrl')]",
             "GroupsGraphScope": "[variables('GroupsGraphScope')]",
             "OAuthUrl": "[variables('OAuthUrl')]",
+            "TeamsEnvironment": "GCCH",
             "ToBotFromChannelOpenIdMetadataUrl": "[variables('ToBotFromChannelOpenIdMetadataUrl')]",
             "ToBotFromChannelTokenIssuer": "[variables('ToBotFromChannelTokenIssuer')]",
             "ToBotFromEmulatorOpenIdMetadataUrl": "[variables('ToBotFromEmulatorOpenIdMetadataUrl')]",
-            "ToChannelFromBotLoginUrl": "[[variables('ToChannelFromBotLoginUrl')]",
+            "ToChannelFromBotLoginUrl": "[variables('ToChannelFromBotLoginUrl')]",
             "ToChannelFromBotOAuthScope": "[variables('ToChannelFromBotOAuthScope')]",
             "ValidateAuthority": "true"
           }
@@ -722,6 +728,7 @@
             "i18n:SupportedCultures": "[variables('i18n:SupportedCultures')]",
             "ProactivelyInstallUserApp": "[variables('ProactivelyInstallUserApp')]",
             "UserAppExternalId": "[variables('UserAppExternalId')]",
+            "AzureAd:TenantId": "[parameters('tenantId')]",
             "TenantId": "[parameters('tenantId')]",
             "UserAppId": "[parameters('userClientId')]",
             "UserAppPassword": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('UserAppSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
@@ -756,8 +763,9 @@
             "ToBotFromChannelOpenIdMetadataUrl": "[variables('ToBotFromChannelOpenIdMetadataUrl')]",
             "ToBotFromChannelTokenIssuer": "[variables('ToBotFromChannelTokenIssuer')]",
             "ToBotFromEmulatorOpenIdMetadataUrl": "[variables('ToBotFromEmulatorOpenIdMetadataUrl')]",
-            "ToChannelFromBotLoginUrl": "[[variables('ToChannelFromBotLoginUrl')]",
+            "ToChannelFromBotLoginUrl": "[variables('ToChannelFromBotLoginUrl')]",
             "ToChannelFromBotOAuthScope": "[variables('ToChannelFromBotOAuthScope')]",
+            "TeamsEnvironment": "GCCH",
             "ValidateAuthority": "true"
           }
         },
@@ -849,8 +857,9 @@
             "ToBotFromChannelOpenIdMetadataUrl": "[variables('ToBotFromChannelOpenIdMetadataUrl')]",
             "ToBotFromChannelTokenIssuer": "[variables('ToBotFromChannelTokenIssuer')]",
             "ToBotFromEmulatorOpenIdMetadataUrl": "[variables('ToBotFromEmulatorOpenIdMetadataUrl')]",
-            "ToChannelFromBotLoginUrl": "[[variables('ToChannelFromBotLoginUrl')]",
+            "ToChannelFromBotLoginUrl": "[variables('ToChannelFromBotLoginUrl')]",
             "ToChannelFromBotOAuthScope": "[variables('ToChannelFromBotOAuthScope')]",
+            "TeamsEnvironment": "GCCH",
             "ValidateAuthority": "true"
           }
         },
@@ -945,8 +954,9 @@
             "ToBotFromChannelOpenIdMetadataUrl": "[variables('ToBotFromChannelOpenIdMetadataUrl')]",
             "ToBotFromChannelTokenIssuer": "[variables('ToBotFromChannelTokenIssuer')]",
             "ToBotFromEmulatorOpenIdMetadataUrl": "[variables('ToBotFromEmulatorOpenIdMetadataUrl')]",
-            "ToChannelFromBotLoginUrl": "[[variables('ToChannelFromBotLoginUrl')]",
+            "ToChannelFromBotLoginUrl": "[variables('ToChannelFromBotLoginUrl')]",
             "ToChannelFromBotOAuthScope": "[variables('ToChannelFromBotOAuthScope')]",
+            "TeamsEnvironment": "GCCH",
             "ValidateAuthority": "true"
           }
         },

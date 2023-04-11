@@ -12,6 +12,7 @@ namespace Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Microsoft
     using FluentAssertions;
     using Microsoft.Graph;
     using Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Mock;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Configuration;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGraph;
     using Moq;
     using Xunit;
@@ -29,7 +30,9 @@ namespace Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Microsoft
         {
             // Arrange
             Mock<IGraphServiceClient> graphServiceClientMock = new Mock<IGraphServiceClient>();
-            Action action = () => new UsersService(graphServiceClientMock.Object, null/*TODO - fix this*/);
+            Mock<IAppConfiguration> appConfigurationMock = new Mock<IAppConfiguration>();
+
+            Action action = () => new UsersService(graphServiceClientMock.Object, appConfigurationMock.Object);
 
             // Act and Assert.
             action.Should().NotThrow();
@@ -211,7 +214,7 @@ namespace Microsoft.Teams.App.CompanyCommunicator.Common.Test.Services.Microsoft
             });
 
             GraphServiceClient client = new GraphServiceClient(new MockAuthenticationHelper(), mockHttpProvider);
-            return new UsersService(client, null/*TODO - fix this*/);
+            return new UsersService(client, new CommericalConfiguration("tenant Id"));
         }
     }
 }

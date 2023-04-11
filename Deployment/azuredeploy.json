@@ -701,7 +701,6 @@
             "i18n:SupportedCultures": "[variables('i18n:SupportedCultures')]",
             "ProactivelyInstallUserApp": "[variables('ProactivelyInstallUserApp')]",
             "UserAppExternalId": "[variables('UserAppExternalId')]",
-            "AzureAd:TenantId": "[parameters('tenantId')]",
             "TenantId": "[parameters('tenantId')]",
             "UserAppId": "[parameters('userClientId')]",
             "UserAppPassword": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('UserAppSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",

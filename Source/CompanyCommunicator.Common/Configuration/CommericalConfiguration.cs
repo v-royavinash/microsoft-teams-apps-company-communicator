@@ -3,7 +3,7 @@
     /// <summary>
     /// App configuration for commercial environment.
     /// </summary>
-    internal class CommericalConfiguration : IAppConfiguration
+    public class CommericalConfiguration : IAppConfiguration
     {
         private readonly string tenantId;
 
@@ -17,7 +17,7 @@
         }
 
         /// <inheritdoc/>
-        public string AzureAd_Instance => "https://login.microsoftonline.com/";
+        public string AzureAd_Instance => "https://login.microsoftonline.com";
 
         /// <inheritdoc/>
         public string AzureAd_ValidIssuers => "https://login.microsoftonline.com/TENANT_ID/v2.0,https://sts.windows.net/TENANT_ID/";

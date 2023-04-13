@@ -122,7 +122,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions
         /// <param name="configuration">Configuration.</param>
         public static void AddAppConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            var tenantId = configuration.GetValue<string>("TenantId");
+            var tenantId = configuration.GetValue<string>("TenantId") ?? configuration.GetValue<string>("AzureAd:TenantId");
             var env = configuration.GetTeamsEnvironment();
             services.AddSingleton<IAppConfiguration>(new ConfigurationFactory(tenantId).GetAppConfiguration(env));
         }

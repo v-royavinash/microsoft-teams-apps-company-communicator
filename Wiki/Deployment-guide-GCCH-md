@@ -161,7 +161,7 @@ Register three Azure AD application in your tenant's directory: one for author b
 1. Click on Channels in Settings section of Bot Services and click on "Edit" button for Microsoft Teams Channel. Click on Delete Channel.
 
 1. Once deleted, click on "Configure Microsoft Teams Channel" icon inside "Add a featured Channel". Select "Microsoft Teams for Government" and click on Save.
-![Add channel to bot](images/BotChannelGovernment.PNG)
+![Add channel to bot](images/BotChannelGovernment.png)
 
 1. Wait for the deployment to finish. You can check the progress of the deployment from the "Notifications" pane of the Azure Portal. It may take **up to an hour** for the deployment to finish.
 

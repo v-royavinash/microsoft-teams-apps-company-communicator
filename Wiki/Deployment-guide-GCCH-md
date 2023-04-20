@@ -158,8 +158,10 @@ Register three Azure AD application in your tenant's directory: one for author b
 
 1. While the deployment is still in progress, go to the Resource group. Search for Author Bot Service created by ARM template. Name of Bot Service will be base resource name which was provided earlier.
 
-1. Click on Channels in Settings section of Bot Services and click on "Microsoft Teams" under Available Channels. Accept the Terms of Service.
+1. Click on Channels in Settings section of Bot Services and click on "Microsoft Teams" under Available Channels.
 ![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_3.PNG)
+
+1.  Accept the Terms of Service.
 ![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_2.PNG)
 
 1. Select "Microsoft Teams for GCC High" and click on Apply. Repeat the above steps for User Bot Service.
@@ -248,7 +250,7 @@ Continuing from the Microsoft Graph Azure AD app registration page where we ende
 
     * Under **Commonly used Microsoft APIs**, 
 
-    * Select �Microsoft Graph�, then select **Delegated permissions** and check the following permissions,
+    * Select Microsoft Graph, then select **Delegated permissions** and check the following permissions,
         1. **GroupMember.Read.All**
         2. **AppCatalog.Read.All**
 

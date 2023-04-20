@@ -39,7 +39,7 @@ To begin, you will need:
 
 Register three Azure AD application in your tenant's directory: one for author bot, one for user bot and another for graph app.
 
-1. Log in to the Azure Portal for your subscription, and go to the [App registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) blade.
+1. Log in to the Azure Portal for your subscription, and go to the [App registrations](https://portal.azure.us/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) blade.
 
 1. Click **New registration** to create an Azure AD application.
     - **Name**: Name of your Teams App - if you are following the template for a default deployment, we recommend "Company Communicator User".
@@ -87,7 +87,7 @@ Register three Azure AD application in your tenant's directory: one for author b
 ## 2. Deploy to your Azure subscription
 1. Click on the **Deploy to Azure** button below.
    
-   [![Deploy to Azure](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOfficeDev%2Fmicrosoft-teams-company-communicator-app%2Fmain%2FDeployment%2Fazuredeploy.json)
+   [![Deploy to Azure](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/deploybutton.png)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fv-royavinash%2Fmicrosoft-teams-apps-company-communicator%2Froyavinash%2Fgcch-code-base-support%2FDeployment%2FGCCH%2Fazuredeploy.json)
 
 1. When prompted, log in to your Azure subscription.
 
@@ -158,10 +158,12 @@ Register three Azure AD application in your tenant's directory: one for author b
 
 1. While the deployment is still in progress, go to the Resource group. Search for Bot Service created by ARM template. Name of Bot Service will be base resource name which was provided earlier.
 
-1. Click on Channels in Settings section of Bot Services and click on "Edit" button for Microsoft Teams Channel. Click on Delete Channel.
+1. Click on Channels in Settings section of Bot Services and click on "Microsoft Teams" under Available Channels. Accept the Terms of Service.
+![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_3.png)
+![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment1.png)
 
-1. Once deleted, click on "Configure Microsoft Teams Channel" icon inside "Add a featured Channel". Select "Microsoft Teams for Government" and click on Save.
-![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment.png)
+1. Select "Microsoft Teams for GCC High." icon inside "Add a featured Channel" and click on Apply.
+![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_2.png)
 
 1. Wait for the deployment to finish. You can check the progress of the deployment from the "Notifications" pane of the Azure Portal. It may take **up to an hour** for the deployment to finish.
 

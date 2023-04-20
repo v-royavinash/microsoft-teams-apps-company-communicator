@@ -156,14 +156,14 @@ Register three Azure AD application in your tenant's directory: one for author b
 
     > **Note:** The Bot Service will fail initially. Follow the steps below to resolve the issue.
 
-1. While the deployment is still in progress, go to the Resource group. Search for Bot Service created by ARM template. Name of Bot Service will be base resource name which was provided earlier.
+1. While the deployment is still in progress, go to the Resource group. Search for Author Bot Service created by ARM template. Name of Bot Service will be base resource name which was provided earlier.
 
 1. Click on Channels in Settings section of Bot Services and click on "Microsoft Teams" under Available Channels. Accept the Terms of Service.
-![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_3.png)
-![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment1.png)
+![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_3.PNG)
+![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_2.PNG)
 
-1. Select "Microsoft Teams for GCC High." icon inside "Add a featured Channel" and click on Apply.
-![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment_2.png)
+1. Select "Microsoft Teams for GCC High" and click on Apply. Repeat the above steps for User Bot Service.
+![Add channel to bot](https://github.com/v-royavinash/microsoft-teams-apps-company-communicator/blob/royavinash/gcch-code-base-support/Wiki/images/BotChannelGovernment1.PNG)
 
 1. Wait for the deployment to finish. You can check the progress of the deployment from the "Notifications" pane of the Azure Portal. It may take **up to an hour** for the deployment to finish.
 

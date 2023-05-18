@@ -317,7 +317,7 @@
     "UserAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('UserAppSecretName'))]",
     "AuthorAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('AuthorAppSecretName'))]",
     "GraphAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('GraphAppSecretName'))]",
-    "netFrameworkVersion": "v6.0"
+    "netFrameworkVersion":"v6.0"
   },
   "resources": [
     {

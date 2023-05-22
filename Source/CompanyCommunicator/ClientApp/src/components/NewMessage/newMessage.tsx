@@ -488,7 +488,7 @@ export const NewMessage = () => {
     if (validator.isURL(event.target.value) || event.target.value === "") {
       setBtnLinkErrorMessage("");
     } else {
-      setBtnLinkErrorMessage("Please enter a valid URL");
+      setBtnLinkErrorMessage(`${event.target.value} is invalid. Please enter a valid URL`);
     }
     setCardBtn(card, messageState.buttonTitle, event.target.value);
     setMessageState({ ...messageState, buttonLink: event.target.value });

@@ -51,6 +51,7 @@ export const SendConfirmationTask = () => {
   const [loader, setLoader] = React.useState(true);
   const [isCardReady, setIsCardReady] = React.useState(false);
   const [disableSendButton, setDisableSendButton] = React.useState(false);
+  const [cardAreaBorderClass, setCardAreaBorderClass] = React.useState('');
 
   const [messageState, setMessageState] = React.useState<IMessageState>({
     id: "",
@@ -80,7 +81,8 @@ export const SendConfirmationTask = () => {
       adaptiveCard.parse(card);
       const renderCard = adaptiveCard.render();
       if (renderCard) {
-        document.getElementsByClassName("card-area")[0].appendChild(renderCard);
+        document.getElementsByClassName("card-area-1")[0].appendChild(renderCard);
+        setCardAreaBorderClass('card-area-border');
       }
       adaptiveCard.onExecuteAction = function (action: any) {
         window.open(action.url, "_blank");
@@ -90,7 +92,7 @@ export const SendConfirmationTask = () => {
   }, [isCardReady, consentState.isConsentsUpdated, messageState.isDraftMsgUpdated]);
 
   const updateCardData = (msg: IMessageState) => {
-    card = getInitAdaptiveCard(t);
+    card = getInitAdaptiveCard(msg.title);
     setCardTitle(card, msg.title);
     setCardImageLink(card, msg.imageLink);
     setCardSummary(card, msg.summary);
@@ -195,40 +197,31 @@ export const SendConfirmationTask = () => {
     <>
       {loader && <Spinner />}
       <>
-        <div className="adaptive-task-grid">
-          <div className="form-area">
+        <div className='adaptive-task-grid'>
+          <div className='form-area'>
             {!loader && (
               <>
-                <div style={{ paddingBottom: "16px" }}>
-                  <Field size="large" label={t("ConfirmToSend")}>
-                    <Text>{t("SendToRecipientsLabel")}</Text>
+                <div style={{ paddingBottom: '16px' }}>
+                  <Field size='large' label={t('ConfirmToSend')}>
+                    <Text>{t('SendToRecipientsLabel')}</Text>
                   </Field>
                 </div>
                 <div>{renderAudienceSelection()}</div>
               </>
             )}
           </div>
-          <div className="card-area"></div>
+          <div className='card-area'>
+            <div className={cardAreaBorderClass}>
+              <div className='card-area-1'></div>
+            </div>
+          </div>
         </div>
-        <div className="fixed-footer">
-          <div className="footer-action-right">
-            <div className="footer-actions-flex">
-              {disableSendButton && (
-                <Spinner
-                  role="alert"
-                  id="sendLoader"
-                  label={t("PreparingMessageLabel")}
-                  size="small"
-                  labelPosition="after"
-                />
-              )}
-              <Button
-                disabled={disableSendButton}
-                style={{ marginLeft: "16px" }}
-                onClick={onSendMessage}
-                appearance="primary"
-              >
-                {t("Send")}
+        <div className='fixed-footer'>
+          <div className='footer-action-right'>
+            <div className='footer-actions-flex'>
+              {disableSendButton && <Spinner role='alert' id='sendLoader' label={t('PreparingMessageLabel')} size='small' labelPosition='after' />}
+              <Button disabled={loader || disableSendButton} style={{ marginLeft: '16px' }} onClick={onSendMessage} appearance='primary'>
+                {t('Send')}
               </Button>
             </div>
           </div>

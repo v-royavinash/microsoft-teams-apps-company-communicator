@@ -1,49 +1,47 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as AdaptiveCards from "adaptivecards";
-import { TFunction } from "i18next";
-import MarkdownIt from "markdown-it";
+import * as AdaptiveCards from 'adaptivecards';
+import MarkdownIt from 'markdown-it';
 
 AdaptiveCards.AdaptiveCard.onProcessMarkdown = function (text, result) {
   result.outputHtml = new MarkdownIt().render(text);
   result.didProcess = true;
 };
 
-export const getInitAdaptiveCard = (t: TFunction) => {
-  const titleTextAsString = t("TitleText");
+export const getInitAdaptiveCard = (titleText: string) => {
   return {
-    type: "AdaptiveCard",
+    type: 'AdaptiveCard',
     body: [
       {
-        type: "TextBlock",
-        weight: "Bolder",
-        text: titleTextAsString,
-        size: "ExtraLarge",
+        type: 'TextBlock',
+        weight: 'Bolder',
+        text: titleText,
+        size: 'ExtraLarge',
         wrap: true,
       },
       {
-        type: "Image",
-        spacing: "Default",
-        url: "",
-        altText: "",
-        size: "Auto",
+        type: 'Image',
+        spacing: 'Default',
+        url: '',
+        altText: '',
+        size: 'Auto',
       },
       {
-        type: "TextBlock",
-        text: "",
+        type: 'TextBlock',
+        text: '',
         wrap: true,
       },
       {
-        type: "TextBlock",
+        type: 'TextBlock',
+        size: 'Small',
+        weight: 'Lighter',
+        text: '',
         wrap: true,
-        size: "Small",
-        weight: "Lighter",
-        text: "",
       },
     ],
-    $schema: "https://adaptivecards.io/schemas/adaptive-card.json",
-    version: "1.0",
+    $schema: 'https://adaptivecards.io/schemas/adaptive-card.json',
+    version: '1.0',
   };
 };
 
@@ -92,7 +90,7 @@ export const setCardBtn = (card: any, buttonTitle?: string, buttonLink?: string)
   if (buttonTitle && buttonLink) {
     card.actions = [
       {
-        type: "Action.OpenUrl",
+        type: 'Action.OpenUrl',
         title: buttonTitle,
         url: buttonLink,
       },

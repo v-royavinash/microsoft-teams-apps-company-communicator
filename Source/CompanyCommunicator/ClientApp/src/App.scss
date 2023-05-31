@@ -3,7 +3,7 @@
         display: grid;
         min-height: 500px;
         padding: 2rem 2rem 8rem 2rem;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 50% 50%;
         grid-template-areas:
             'form-area card-area'
     }
@@ -16,8 +16,6 @@
     .card-area {
         grid-column: 2;
         padding: 1rem;
-        border: 2px solid var(--colorNeutralBackground5Hover);
-        border-top-color: var(--colorBrandForegroundInvertedPressed);
     }
 
     .big-screen-visible {
@@ -43,13 +41,17 @@
     .card-area {
         grid-row: 2;
         padding: 1rem;
-        border: 2px solid var(--colorNeutralBackground5Hover);
-        border-top-color: var(--colorBrandForegroundInvertedPressed);
+        max-width: 767px;
     }
 
     .big-screen-visible {
         display: none;
     }
+}
+
+.card-area-border {
+    border: 2px solid var(--colorNeutralBackground5Hover);
+    border-top-color: var(--colorBrandForegroundInvertedPressed);
 }
 
 .wizard-page {
@@ -101,7 +103,47 @@
     color: var(--colorPalettePumpkinForeground2);
 }
 
+.recipient-text {
+    vertical-align: middle;
+    padding-left: 1px;
+    display: inline-block;
+    width: 32px;
+    padding-right: 8px;
+}
+
 // this can be removed in future. setting this as fluent_ui table has offset issues.
 .fui-TableCell {
     outline-offset: -2px;
+}
+
+@media screen and (max-width: 1096px) {
+    .fui-Persona__primaryText {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 224px;
+    }
+}
+
+@media screen and (max-width: 960px) {
+    .fui-Persona__primaryText {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 184px;
+    }
+}
+
+@media screen and (max-width: 840px) {
+    .fui-Persona__primaryText {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 144px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .fui-Persona__primaryText {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 100px;
+    }
 }

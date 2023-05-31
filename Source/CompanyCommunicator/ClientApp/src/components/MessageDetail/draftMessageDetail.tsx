@@ -120,6 +120,7 @@ export const DraftMessageDetail = (draftMessages: any) => {
           <TableRow key={item.id + "key"}>
             <TableCell tabIndex={0} role="gridcell">
               <TableCellLayout
+                truncate
                 media={<Chat20Regular />}
                 style={{ cursor: "pointer" }}
                 onClick={() => onOpenTaskModule(null, editUrl(item.id), t("EditMessage"))}

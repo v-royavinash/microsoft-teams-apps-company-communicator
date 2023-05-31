@@ -1,25 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as AdaptiveCards from "adaptivecards";
-import * as React from "react";
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
-import { AvatarShape } from "@fluentui/react-avatar";
-import { Button, Field, Persona, Spinner, Text } from "@fluentui/react-components";
-import { ArrowDownload24Regular, CheckmarkSquare24Regular, ShareScreenStop24Regular } from "@fluentui/react-icons";
-import * as microsoftTeams from "@microsoft/teams-js";
+import * as AdaptiveCards from 'adaptivecards';
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { AvatarShape } from '@fluentui/react-avatar';
+import { Button, Field, Persona, Spinner, Text } from '@fluentui/react-components';
+import { ArrowDownload24Regular, CheckmarkSquare24Regular, ShareScreenStop24Regular } from '@fluentui/react-icons';
+import * as microsoftTeams from '@microsoft/teams-js';
 
-import { exportNotification, getSentNotification } from "../../apis/messageListApi";
-import { formatDate, formatDuration, formatNumber } from "../../i18n";
-import {
-  getInitAdaptiveCard,
-  setCardAuthor,
-  setCardBtn,
-  setCardImageLink,
-  setCardSummary,
-  setCardTitle,
-} from "../AdaptiveCard/adaptiveCard";
+import { exportNotification, getSentNotification } from '../../apis/messageListApi';
+import { formatDate, formatDuration, formatNumber } from '../../i18n';
+import { getInitAdaptiveCard, setCardAuthor, setCardBtn, setCardImageLink, setCardSummary, setCardTitle } from '../AdaptiveCard/adaptiveCard';
 
 export interface IMessageState {
   id: string;
@@ -65,16 +58,17 @@ export const ViewStatusTask = () => {
   const [loader, setLoader] = React.useState(true);
   const [isCardReady, setIsCardReady] = React.useState(false);
   const [exportDisabled, setExportDisabled] = React.useState(false);
+  const [cardAreaBorderClass, setCardAreaBorderClass] = React.useState('');
 
   const [messageState, setMessageState] = React.useState<IMessageState>({
-    id: "",
-    title: "",
+    id: '',
+    title: '',
     isMsgDataUpdated: false,
   });
 
   const [statusState, setStatusState] = React.useState<IStatusState>({
-    page: "ViewStatus",
-    teamId: "",
+    page: 'ViewStatus',
+    teamId: '',
     isTeamDataUpdated: false,
   });
 
@@ -95,11 +89,12 @@ export const ViewStatusTask = () => {
       var adaptiveCard = new AdaptiveCards.AdaptiveCard();
       adaptiveCard.parse(card);
       const renderCard = adaptiveCard.render();
-      if (renderCard && statusState.page === "ViewStatus") {
-        document.getElementsByClassName("card-area")[0].appendChild(renderCard);
+      if (renderCard && statusState.page === 'ViewStatus') {
+        document.getElementsByClassName('card-area-1')[0].appendChild(renderCard);
+        setCardAreaBorderClass('card-area-border');
       }
       adaptiveCard.onExecuteAction = function (action: any) {
-        window.open(action.url, "_blank");
+        window.open(action.url, '_blank');
       };
       setLoader(false);
     }
@@ -124,7 +119,7 @@ export const ViewStatusTask = () => {
   };
 
   const updateCardData = (msg: IMessageState) => {
-    card = getInitAdaptiveCard(t);
+    card = getInitAdaptiveCard(msg.title);
     setCardTitle(card, msg.title);
     setCardImageLink(card, msg.imageLink);
     setCardSummary(card, msg.summary);
@@ -147,10 +142,10 @@ export const ViewStatusTask = () => {
     };
     await exportNotification(payload)
       .then(() => {
-        setStatusState({ ...statusState, page: "SuccessPage" });
+        setStatusState({ ...statusState, page: 'SuccessPage' });
       })
       .catch(() => {
-        setStatusState({ ...statusState, page: "ErrorPage" });
+        setStatusState({ ...statusState, page: 'ErrorPage' });
       })
       .finally(() => {
         setExportDisabled(false);
@@ -162,8 +157,8 @@ export const ViewStatusTask = () => {
     if (items) {
       items.map((element) => {
         resultedTeams.push(
-          <li key={element + "key"}>
-            <Persona name={element} secondaryText={secondaryText} avatar={{ shape, color: "colorful" }} />
+          <li key={element + 'key'}>
+            <Persona name={element} secondaryText={secondaryText} avatar={{ shape, color: 'colorful' }} />
           </li>
         );
       });
@@ -174,27 +169,27 @@ export const ViewStatusTask = () => {
   const renderAudienceSelection = () => {
     if (messageState.teamNames && messageState.teamNames.length > 0) {
       return (
-        <Field size="large" label={t("SentToGeneralChannel")}>
-          <ul className="ul-no-bullets">{getItemList(messageState.teamNames, "Team", "square")}</ul>
+        <Field size='large' label={t('SentToGeneralChannel')}>
+          <ul className='ul-no-bullets'>{getItemList(messageState.teamNames, 'Team', 'square')}</ul>
         </Field>
       );
     } else if (messageState.rosterNames && messageState.rosterNames.length > 0) {
       return (
-        <Field size="large" label={t("SentToRosters")}>
-          <ul className="ul-no-bullets">{getItemList(messageState.rosterNames, "Team", "square")}</ul>
+        <Field size='large' label={t('SentToRosters')}>
+          <ul className='ul-no-bullets'>{getItemList(messageState.rosterNames, 'Team', 'square')}</ul>
         </Field>
       );
     } else if (messageState.groupNames && messageState.groupNames.length > 0) {
       return (
-        <Field size="large" label={t("SentToGroups1")}>
-          <span>{t("SentToGroups2")}</span>
-          <ul className="ul-no-bullets">{getItemList(messageState.groupNames, "Group", "circular")}</ul>
+        <Field size='large' label={t('SentToGroups1')}>
+          <span>{t('SentToGroups2')}</span>
+          <ul className='ul-no-bullets'>{getItemList(messageState.groupNames, 'Group', 'circular')}</ul>
         </Field>
       );
     } else if (messageState.allUsers) {
       return (
         <>
-          <Text size={500}>{t("SendToAllUsers")}</Text>
+          <Text size={500}>{t('SendToAllUsers')}</Text>
         </>
       );
     } else {
@@ -206,8 +201,8 @@ export const ViewStatusTask = () => {
     if (messageState.errorMessage) {
       return (
         <div>
-          <Field size="large" label={t("Errors")}>
-            <Text className="info-text">{messageState.errorMessage}</Text>
+          <Field size='large' label={t('Errors')}>
+            <Text className='info-text'>{messageState.errorMessage}</Text>
           </Field>
         </div>
       );
@@ -220,8 +215,8 @@ export const ViewStatusTask = () => {
     if (messageState.warningMessage) {
       return (
         <div>
-          <Field size="large" label={t("Warnings")}>
-            <Text className="info-text">{messageState.warningMessage}</Text>
+          <Field size='large' label={t('Warnings')}>
+            <Text className='info-text'>{messageState.warningMessage}</Text>
           </Field>
         </div>
       );
@@ -233,121 +228,123 @@ export const ViewStatusTask = () => {
   return (
     <>
       {loader && <Spinner />}
-      {statusState.page === "ViewStatus" && (
+      {statusState.page === 'ViewStatus' && (
         <>
-          <span role="alert" aria-label={t("ViewMessageStatus")} />
-          <div className="adaptive-task-grid">
-            <div className="form-area">
+          <span role='alert' aria-label={t('ViewMessageStatus')} />
+          <div className='adaptive-task-grid'>
+            <div className='form-area'>
               {!loader && (
                 <>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <Field size="large" label={t("TitleText")}>
+                  <div style={{ paddingBottom: '16px' }}>
+                    <Field size='large' label={t('TitleText')}>
                       <Text>{messageState.title}</Text>
                     </Field>
                   </div>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <Field className="spacingVerticalM" size="large" label={t("SendingStarted")}>
+                  <div style={{ paddingBottom: '16px' }}>
+                    <Field className='spacingVerticalM' size='large' label={t('SendingStarted')}>
                       <Text>{messageState.sendingStartedDate}</Text>
                     </Field>
                   </div>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <Field size="large" label={t("Completed")}>
+                  <div style={{ paddingBottom: '16px' }}>
+                    <Field size='large' label={t('Completed')}>
                       <Text>{messageState.sentDate}</Text>
                     </Field>
                   </div>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <Field size="large" label={t("CreatedBy")}>
-                      <Persona name={messageState.createdBy} secondaryText={"Member"} avatar={{ color: "colorful" }} />
+                  <div style={{ paddingBottom: '16px' }}>
+                    <Field size='large' label={t('CreatedBy')}>
+                      <Persona name={messageState.createdBy} secondaryText={'Member'} avatar={{ color: 'colorful' }} />
                     </Field>
                   </div>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <Field size="large" label={t("Duration")}>
+                  <div style={{ paddingBottom: '16px' }}>
+                    <Field size='large' label={t('Duration')}>
                       <Text>{messageState.sendingDuration}</Text>
                     </Field>
                   </div>
-                  <div style={{ paddingBottom: "16px" }}>
-                    <Field size="large" label={t("Results")}>
-                      <Text>{t("Success", { SuccessCount: messageState.succeeded })}</Text>
-                      <Text>{t("Failure", { FailureCount: messageState.failed })}</Text>
+                  <div style={{ paddingBottom: '16px' }}>
+                    <Field size='large' label={t('Results')}>
+                      <Text>{t('Success', { SuccessCount: messageState.succeeded })}</Text>
+                      <Text>{t('Failure', { FailureCount: messageState.failed })}</Text>
                       {messageState.unknown && (
                         <>
-                          <Text>{t("Unknown", { UnknownCount: messageState.unknown })}</Text>
+                          <Text>{t('Unknown', { UnknownCount: messageState.unknown })}</Text>
                         </>
                       )}
                     </Field>
                   </div>
-                  <div style={{ paddingBottom: "16px" }}>{renderAudienceSelection()}</div>
-                  <div style={{ paddingBottom: "16px" }}>{renderErrorMessage()}</div>
-                  <div style={{ paddingBottom: "16px" }}>{renderWarningMessage()}</div>
+                  <div style={{ paddingBottom: '16px' }}>
+                    {renderAudienceSelection()}
+                    {renderErrorMessage()}
+                    {renderWarningMessage()}
+                  </div>
                 </>
               )}
             </div>
-            <div className="card-area"></div>
+            <div className='card-area'>
+              <div className={cardAreaBorderClass}>
+                <div className='card-area-1'></div>
+              </div>
+            </div>
           </div>
-          <div className="fixed-footer">
-            <div className="footer-action-right">
-              <div className="footer-actions-flex">
-                {exportDisabled && <Spinner role="alert" size="small" label={t("ExportLabel")} labelPosition="after" />}
+          <div className='fixed-footer'>
+            <div className='footer-action-right'>
+              <div className='footer-actions-flex'>
+                {exportDisabled && <Spinner role='alert' size='small' label={t('ExportLabel')} labelPosition='after' />}
                 <Button
                   icon={<ArrowDownload24Regular />}
-                  style={{ marginLeft: "16px" }}
-                  title={
-                    exportDisabled || messageState.canDownload === false
-                      ? t("ExportButtonProgressText")
-                      : t("ExportButtonText")
-                  }
+                  style={{ marginLeft: '16px' }}
+                  title={exportDisabled || messageState.canDownload === false ? t('ExportButtonProgressText') : t('ExportButtonText')}
                   disabled={exportDisabled || messageState.canDownload === false}
                   onClick={onExport}
-                  appearance="primary"
+                  appearance='primary'
                 >
-                  {t("ExportButtonText")}
+                  {t('ExportButtonText')}
                 </Button>
               </div>
             </div>
           </div>
         </>
       )}
-      {!loader && statusState.page === "SuccessPage" && (
+      {!loader && statusState.page === 'SuccessPage' && (
         <>
-          <span role="alert" aria-label={t("ExportSuccessView")} />
-          <div className="wizard-page">
+          <span role='alert' aria-label={t('ExportSuccessView')} />
+          <div className='wizard-page'>
             <h2>
-              <CheckmarkSquare24Regular style={{ color: "#22bb33", verticalAlign: "middle", paddingRight: "8px" }} />
-              {t("ExportQueueTitle")}
+              <CheckmarkSquare24Regular style={{ color: '#22bb33', verticalAlign: 'top', paddingRight: '4px' }} />
+              {t('ExportQueueTitle')}
             </h2>
-            <Text>{t("ExportQueueSuccessMessage1")}</Text>
+            <Text>{t('ExportQueueSuccessMessage1')}</Text>
             <br />
             <br />
-            <Text>{t("ExportQueueSuccessMessage2")}</Text>
+            <Text>{t('ExportQueueSuccessMessage2')}</Text>
             <br />
             <br />
-            <Text>{t("ExportQueueSuccessMessage3")}</Text>
+            <Text>{t('ExportQueueSuccessMessage3')}</Text>
             <br />
             <br />
-            <div className="fixed-footer">
-              <div className="footer-action-right">
-                <Button id="closeBtn" onClick={onClose} appearance="primary">
-                  {t("CloseText")}
+            <div className='fixed-footer'>
+              <div className='footer-action-right'>
+                <Button id='closeBtn' onClick={onClose} appearance='primary'>
+                  {t('CloseText')}
                 </Button>
               </div>
             </div>
           </div>
         </>
       )}
-      {!loader && statusState.page === "ErrorPage" && (
+      {!loader && statusState.page === 'ErrorPage' && (
         <>
-          <span role="alert" aria-label={t("ExportFailureView")} />
-          <div className="wizard-page">
+          <span role='alert' aria-label={t('ExportFailureView')} />
+          <div className='wizard-page'>
             <h2>
-              <ShareScreenStop24Regular style={{ color: "#bb2124", verticalAlign: "middle", paddingRight: "8px" }} />
-              {t("ExportErrorTitle")}
+              <ShareScreenStop24Regular style={{ color: '#bb2124', verticalAlign: 'top', paddingRight: '4px' }} />
+              {t('ExportErrorTitle')}
             </h2>
-            <Text>{t("ExportErrorMessage")}</Text>
+            <Text>{t('ExportErrorMessage')}</Text>
             <br />
-            <div className="fixed-footer">
-              <div className="footer-action-right">
-                <Button id="closeBtn" onClick={onClose} appearance="primary">
-                  {t("CloseText")}
+            <div className='fixed-footer'>
+              <div className='footer-action-right'>
+                <Button id='closeBtn' onClick={onClose} appearance='primary'>
+                  {t('CloseText')}
                 </Button>
               </div>
             </div>

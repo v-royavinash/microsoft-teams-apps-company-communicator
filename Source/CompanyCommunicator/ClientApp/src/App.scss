@@ -60,7 +60,7 @@
 
 .fixed-footer {
     display: inline;
-    position: fixed;
+    // position: fixed;
     left: 0;
     bottom: 0;
     width: 100%;
@@ -145,5 +145,23 @@
         text-overflow: ellipsis;
         overflow: hidden;
         width: 100px;
+    }
+}
+
+.sent-messages {
+    @media screen and (min-width: 1096px) {
+        .fui-Persona__primaryText {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 144px;
+        }
+    }
+
+    @media screen and (max-width: 1095px) {
+        .fui-Persona__primaryText {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: calc(100% - 6px);
+        }
     }
 }

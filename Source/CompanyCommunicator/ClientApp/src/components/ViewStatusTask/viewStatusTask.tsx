@@ -237,7 +237,7 @@ export const ViewStatusTask = () => {
                 <>
                   <div style={{ paddingBottom: '16px' }}>
                     <Field size='large' label={t('TitleText')}>
-                      <Text>{messageState.title}</Text>
+                      <Text style={{ overflowWrap: 'anywhere' }}>{messageState.title}</Text>
                     </Field>
                   </div>
                   <div style={{ paddingBottom: '16px' }}>

@@ -123,7 +123,7 @@ export const SentMessageDetail = (sentMessages: any) => {
   return (
     <>
       {sentMessages?.sentMessages && (
-        <Table {...keyboardNavAttr} role='grid' aria-label='Sent messages table with grid keyboard navigation'>
+        <Table {...keyboardNavAttr} role='grid' className='sent-messages' aria-label='Sent messages table with grid keyboard navigation'>
           <TableHeader>
             <TableRow>
               <TableHeaderCell key='title'>
@@ -213,9 +213,15 @@ export const SentMessageDetail = (sentMessages: any) => {
                   <TableCellLayout truncate>{item.sentDate}</TableCellLayout>
                 </TableCell>
                 <TableCell tabIndex={0} role='gridcell'>
-                  <TableCellLayout title={item.createdBy}>
+                  <TableCellLayout truncate title={item.createdBy}>
                     <span className='big-screen-visible'>
-                      <Persona size='extra-small' textAlignment='center' name={item.createdBy} secondaryText={'Member'} avatar={{ color: 'colorful' }} />
+                      <Persona
+                        size='extra-small'
+                        textAlignment='center'
+                        name={item.createdBy}
+                        secondaryText={'Member'}
+                        avatar={{ color: 'colorful' }}
+                      />
                     </span>
                   </TableCellLayout>
                 </TableCell>

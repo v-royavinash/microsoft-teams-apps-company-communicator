@@ -104,68 +104,60 @@ export const DraftMessageDetail = (draftMessages: any) => {
   };
 
   return (
-    <Table {...keyboardNavAttr} role="grid" aria-label="Draft messages table with grid keyboard navigation">
+    <Table {...keyboardNavAttr} role='grid' aria-label='Draft messages table with grid keyboard navigation'>
       <TableHeader>
         <TableRow>
-          <TableHeaderCell key="title">
-            <b>{t("TitleText")}</b>
+          <TableHeaderCell key='title'>
+            <b>{t('TitleText')}</b>
           </TableHeaderCell>
-          <TableHeaderCell key="actions" style={{ float: "right" }}>
+          <TableHeaderCell key='actions' style={{ width: '50px' }}>
             <b>Actions</b>
           </TableHeaderCell>
         </TableRow>
       </TableHeader>
       <TableBody>
         {draftMessages!.draftMessages!.map((item: any) => (
-          <TableRow key={item.id + "key"}>
-            <TableCell tabIndex={0} role="gridcell">
+          <TableRow key={item.id + 'key'}>
+            <TableCell tabIndex={0} role='gridcell'>
               <TableCellLayout
                 truncate
                 media={<Chat20Regular />}
-                style={{ cursor: "pointer" }}
-                onClick={() => onOpenTaskModule(null, editUrl(item.id), t("EditMessage"))}
+                style={{ cursor: 'pointer' }}
+                onClick={() => onOpenTaskModule(null, editUrl(item.id), t('EditMessage'))}
               >
                 {item.title}
               </TableCellLayout>
             </TableCell>
-            <TableCell>
-              <TableCellLayout style={{ float: "right" }}>
+            <TableCell role='gridcell' style={{ width: '50px' }}>
+              <TableCellLayout>
                 <Menu>
                   <MenuTrigger disableButtonEnhancement>
-                    <Button aria-label="Actions menu" icon={<MoreHorizontal24Filled />} />
+                    <Button aria-label='Actions menu' icon={<MoreHorizontal24Filled />} />
                   </MenuTrigger>
                   <MenuPopover>
                     <MenuList>
                       <MenuItem
                         icon={<SendRegular />}
-                        key={"sendConfirmationKey"}
-                        onClick={() => onOpenTaskModule(null, sendUrl(item.id), t("SendConfirmation"))}
+                        key={'sendConfirmationKey'}
+                        onClick={() => onOpenTaskModule(null, sendUrl(item.id), t('SendConfirmation'))}
                       >
-                        {t("Send")}
+                        {t('Send')}
                       </MenuItem>
-                      <MenuItem
-                        key={"previewInThisChannelKey"}
-                        icon={<OpenRegular />}
-                        onClick={() => checkPreviewMessage(item.id)}
-                      >
-                        {t("PreviewInThisChannel")}
+                      <MenuItem key={'previewInThisChannelKey'} icon={<OpenRegular />} onClick={() => checkPreviewMessage(item.id)}>
+                        {t('PreviewInThisChannel')}
                       </MenuItem>
                       <MenuItem
                         icon={<EditRegular />}
-                        key={"editMessageKey"}
-                        onClick={() => onOpenTaskModule(null, editUrl(item.id), t("EditMessage"))}
+                        key={'editMessageKey'}
+                        onClick={() => onOpenTaskModule(null, editUrl(item.id), t('EditMessage'))}
                       >
-                        {t("Edit")}
+                        {t('Edit')}
                       </MenuItem>
-                      <MenuItem
-                        key={"duplicateKey"}
-                        icon={<DocumentCopyRegular />}
-                        onClick={() => duplicateDraftMessage(item.id)}
-                      >
-                        {t("Duplicate")}
+                      <MenuItem key={'duplicateKey'} icon={<DocumentCopyRegular />} onClick={() => duplicateDraftMessage(item.id)}>
+                        {t('Duplicate')}
                       </MenuItem>
-                      <MenuItem key={"deleteKey"} icon={<DeleteRegular />} onClick={() => deleteDraftMessage(item.id)}>
-                        {t("Delete")}
+                      <MenuItem key={'deleteKey'} icon={<DeleteRegular />} onClick={() => deleteDraftMessage(item.id)}>
+                        {t('Delete')}
                       </MenuItem>
                     </MenuList>
                   </MenuPopover>

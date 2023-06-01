@@ -126,7 +126,7 @@ export const SentMessageDetail = (sentMessages: any) => {
         <Table {...keyboardNavAttr} role='grid' className='sent-messages' aria-label='Sent messages table with grid keyboard navigation'>
           <TableHeader>
             <TableRow>
-              <TableHeaderCell key='title'>
+              <TableHeaderCell key='title' style={{ width: '360px' }}>
                 <b>{t('TitleText')}</b>
               </TableHeaderCell>
               {countStatusMsg() > 0 && <TableHeaderCell key='status' aria-hidden='true' />}
@@ -139,7 +139,7 @@ export const SentMessageDetail = (sentMessages: any) => {
               <TableHeaderCell key='createdBy'>
                 <b className='big-screen-visible'>{t('CreatedBy')}</b>
               </TableHeaderCell>
-              <TableHeaderCell key='actions' style={{ float: 'right' }}>
+              <TableHeaderCell key='actions' style={{ width: '50px' }}>
                 <b>Actions</b>
               </TableHeaderCell>
             </TableRow>
@@ -167,24 +167,28 @@ export const SentMessageDetail = (sentMessages: any) => {
                 )}
                 <TableCell tabIndex={0} role='gridcell'>
                   <TableCellLayout>
-                    <Tooltip content={t('TooltipSuccess') || ''} relationship='label'>
-                      <Button
-                        appearance='subtle'
-                        icon={<CheckmarkSquare24Regular style={{ color: '#22bb33', verticalAlign: 'middle' }} />}
-                        size='small'
-                      ></Button>
-                    </Tooltip>
-                    <span className='recipient-text'>{formatNumber(item.succeeded)}</span>
-                    <Tooltip content={t('TooltipFailure') || ''} relationship='label'>
-                      <Button
-                        appearance='subtle'
-                        icon={<ShareScreenStop24Regular style={{ color: '#bb2124', verticalAlign: 'middle' }} />}
-                        size='small'
-                      ></Button>
-                    </Tooltip>
-                    <span className='recipient-text'>{formatNumber(item.failed)}</span>
+                    <div style={{ display: 'inline-block' }}>
+                      <Tooltip content={t('TooltipSuccess') || ''} relationship='label'>
+                        <Button
+                          appearance='subtle'
+                          icon={<CheckmarkSquare24Regular style={{ color: '#22bb33', verticalAlign: 'middle' }} />}
+                          size='small'
+                        ></Button>
+                      </Tooltip>
+                      <span className='recipient-text'>{formatNumber(item.succeeded)}</span>
+                    </div>
+                    <div style={{ display: 'inline-block' }}>
+                      <Tooltip content={t('TooltipFailure') || ''} relationship='label'>
+                        <Button
+                          appearance='subtle'
+                          icon={<ShareScreenStop24Regular style={{ color: '#bb2124', verticalAlign: 'middle' }} />}
+                          size='small'
+                        ></Button>
+                      </Tooltip>
+                      <span className='recipient-text'>{formatNumber(item.failed)}</span>
+                    </div>
                     {item.canceled && (
-                      <>
+                      <div style={{ display: 'inline-block' }}>
                         <Tooltip content='Canceled' relationship='label'>
                           <Button
                             appearance='subtle'
@@ -193,10 +197,10 @@ export const SentMessageDetail = (sentMessages: any) => {
                           ></Button>
                         </Tooltip>
                         <span className='recipient-text'>{formatNumber(item.canceled)}</span>
-                      </>
+                      </div>
                     )}
                     {item.unknown && (
-                      <>
+                      <div style={{ display: 'inline-block' }}>
                         <Tooltip content='Unknown' relationship='label'>
                           <Button
                             appearance='subtle'
@@ -205,7 +209,7 @@ export const SentMessageDetail = (sentMessages: any) => {
                           ></Button>
                         </Tooltip>
                         <span className='recipient-text'>{formatNumber(item.unknown)}</span>
-                      </>
+                      </div>
                     )}
                   </TableCellLayout>
                 </TableCell>
@@ -225,8 +229,8 @@ export const SentMessageDetail = (sentMessages: any) => {
                     </span>
                   </TableCellLayout>
                 </TableCell>
-                <TableCell role='gridcell'>
-                  <TableCellLayout style={{ float: 'right' }}>
+                <TableCell role='gridcell' style={{ width: '50px' }}>
+                  <TableCellLayout>
                     <Menu>
                       <MenuTrigger disableButtonEnhancement>
                         <Button aria-label='Actions menu' icon={<MoreHorizontal24Filled />} />

@@ -116,38 +116,6 @@
     outline-offset: -2px;
 }
 
-@media screen and (max-width: 1096px) {
-    .fui-Persona__primaryText {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 224px;
-    }
-}
-
-@media screen and (max-width: 960px) {
-    .fui-Persona__primaryText {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 184px;
-    }
-}
-
-@media screen and (max-width: 840px) {
-    .fui-Persona__primaryText {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 144px;
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .fui-Persona__primaryText {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 100px;
-    }
-}
-
 .sent-messages {
     @media screen and (min-width: 1096px) {
         .fui-Persona__primaryText {

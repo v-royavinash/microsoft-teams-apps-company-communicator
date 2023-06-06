@@ -126,7 +126,7 @@ export const SentMessageDetail = (sentMessages: any) => {
         <Table {...keyboardNavAttr} role='grid' className='sent-messages' aria-label='Sent messages table with grid keyboard navigation'>
           <TableHeader>
             <TableRow>
-              <TableHeaderCell key='title' style={{ width: '360px' }}>
+              <TableHeaderCell key='title' style={{ width: '45%' }}>
                 <b>{t('TitleText')}</b>
               </TableHeaderCell>
               {countStatusMsg() > 0 && <TableHeaderCell key='status' aria-hidden='true' />}

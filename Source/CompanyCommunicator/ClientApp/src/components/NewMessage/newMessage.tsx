@@ -898,8 +898,12 @@ export const NewMessage = () => {
             <div className='fixed-footer'>
               <div className='footer-action-right'>
                 <div className='footer-actions-flex'>
+                  <Button id='backBtn' onClick={onBack} disabled={showMsgDraftingSpinner} appearance='secondary'>
+                    {t('Back')}
+                  </Button>
                   {showMsgDraftingSpinner && (
                     <Spinner
+                      style={{ marginLeft: '16px' }}
                       role='alert'
                       id='draftingLoader'
                       size='small'
@@ -907,9 +911,6 @@ export const NewMessage = () => {
                       labelPosition='after'
                     />
                   )}
-                  <Button id='backBtn' style={{ marginLeft: '16px' }} onClick={onBack} disabled={showMsgDraftingSpinner} appearance='secondary'>
-                    {t('Back')}
-                  </Button>
                   <Button
                     style={{ marginLeft: '16px' }}
                     disabled={isSaveBtnDisabled() || showMsgDraftingSpinner}

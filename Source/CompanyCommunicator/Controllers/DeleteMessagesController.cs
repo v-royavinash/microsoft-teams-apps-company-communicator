@@ -23,7 +23,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     /// <summary>
     /// Controller for older deleting messages.
     /// </summary>
-    [Authorize(PolicyNames.MustBeValidDeleteUpnPolicy)]
+    //[Authorize(PolicyNames.MustBeValidDeleteUpnPolicy)]
     [Route("api/deletemessages")]
     public class DeleteMessagesController : Controller
     {

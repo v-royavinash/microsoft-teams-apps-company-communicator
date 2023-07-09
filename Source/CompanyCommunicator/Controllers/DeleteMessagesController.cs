@@ -9,6 +9,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -19,18 +20,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.CleanUpHistory;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Models;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Controller for older deleting messages.
     /// </summary>
-    //[Authorize(PolicyNames.MustBeValidDeleteUpnPolicy)]
+    //[Authorize(PolicyNames.MustBeValidUpnPolicy)]
     [Route("api/deletemessages")]
     public class DeleteMessagesController : Controller
     {
         private readonly ICleanUpHistoryRepository cleanUpHistoryRepository;
         private readonly ISentNotificationDataRepository sentNotificationDataRepository;
         private readonly TableRowKeyGenerator tableRowKeyGenerator;
-        private readonly HttpClient httpClient;
+        private readonly IHttpClientFactory clientFactory;
         private readonly IConfiguration configuration;
 
         /// <summary>
@@ -39,19 +41,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// <param name="cleanUpHistoryRepository">Clean Up History repository instance.</param>
         /// <param name="sentNotificationDataRepository">The SentNotificationData repository.</param>
         /// <param name="tableRowKeyGenerator">Table row key generator service.</param>
-        /// <param name="httpClient">Http client service.</param>
+        /// <param name="clientFactory">Http client service.</param>
         /// <param name="configuration">Configuration service.</param>
         public DeleteMessagesController(
             ICleanUpHistoryRepository cleanUpHistoryRepository,
             ISentNotificationDataRepository sentNotificationDataRepository,
             TableRowKeyGenerator tableRowKeyGenerator,
-            HttpClient httpClient,
+            IHttpClientFactory clientFactory,
             IConfiguration configuration)
         {
             this.cleanUpHistoryRepository = cleanUpHistoryRepository ?? throw new ArgumentNullException(nameof(cleanUpHistoryRepository));
             this.sentNotificationDataRepository = sentNotificationDataRepository ?? throw new ArgumentNullException(nameof(sentNotificationDataRepository));
             this.tableRowKeyGenerator = tableRowKeyGenerator ?? throw new ArgumentNullException(nameof(tableRowKeyGenerator));
-            this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
@@ -117,6 +119,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
 
             var newId = this.tableRowKeyGenerator.CreateNewKeyOrderingMostRecentToOldest();
             deleteHistoricalMessage.RowKeyId = newId;
+            deleteHistoricalMessage.DeletedBy = this.HttpContext.User?.Identity?.Name ?? "defaultUser";
 
             await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
             {
@@ -134,22 +137,25 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             {
                 try
                 {
-                    var httpResponse = await this.httpClient.PutAsJsonAsync(this.configuration["DataFunctionUrl"], deleteHistoricalMessage);
+                    string functionUrl = "http://localhost:7071/api/CompanyCommunicatorDataCleanUpFunction";
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, functionUrl);
+                    string jsonPayload = JsonConvert.SerializeObject(deleteHistoricalMessage);
+                    request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                    if (!httpResponse.IsSuccessStatusCode)
-                    {
-                        throw new Exception($"Failed to send HTTP PUT request to Azure Function: {httpResponse.StatusCode}");
-                    }
+                    this.clientFactory.CreateClient().SendAsync(request);
+
+                    //if (!httpResponse.IsSuccessStatusCode)
+                    //{
+                    //    throw new Exception($"Failed to send HTTP PUT request to Azure Function: {httpResponse.StatusCode}");
+                    //}
                 }
                 catch (Exception ex)
                 {
-                    // ToDO :: 
                     // Log the exception or handle
                     Console.WriteLine($"Exception in background task: {ex.Message}");
                 }
             });
         }
-
 
         /// <summary>
         /// Get the clean up history.

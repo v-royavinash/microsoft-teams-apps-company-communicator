@@ -13,6 +13,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Azure.Cosmos.Table;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -73,7 +74,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [FunctionName("CompanyCommunicatorDataCleanUpFunction")]
         public async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "put", Route = null)]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]
             HttpRequestMessage request, ILogger log)
         {
             var content = request.Content;
@@ -129,8 +130,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
 
             string inputStartDate = requestPram.StartDate;
             string inputEndDate = requestPram.EndDate;
-            var fromDate = DateTimeOffset.ParseExact(inputStartDate, "ddd MMM dd yyyy", CultureInfo.InvariantCulture);
-            var toDate = DateTimeOffset.ParseExact(inputEndDate, "ddd MMM dd yyyy", CultureInfo.InvariantCulture);
+            var fromDate = DateTimeOffset.ParseExact(inputStartDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            var toDate = DateTimeOffset.ParseExact(inputEndDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            //var fromDate = DateTimeOffset.ParseExact(inputStartDate, "ddd MMM dd yyyy", CultureInfo.InvariantCulture);
+            //var toDate = DateTimeOffset.ParseExact(inputEndDate, "ddd MMM dd yyyy", CultureInfo.InvariantCulture);
             await this.PurgeEntitiesAsync(fromDate, toDate, log, this.sentNotificationDataRepository.Table).ConfigureAwait(false);
 
             await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
@@ -169,7 +172,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
         /// <param name="log">the Logger.</param>
         /// <param name="table">The table name.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        public async Task<Tuple<int, int>> PurgeEntitiesAsync(DateTimeOffset purgeStartDate, DateTimeOffset purgeEndDate,  ILogger log, CloudTable table)
+        public async Task<Tuple<int, int>> PurgeEntitiesAsync(DateTimeOffset purgeStartDate, DateTimeOffset purgeEndDate, ILogger log, CloudTable table)
         {
             var sw = new Stopwatch();
             sw.Start();

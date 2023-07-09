@@ -137,7 +137,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             {
                 try
                 {
-                    string functionUrl = "http://localhost:7071/api/CompanyCommunicatorDataCleanUpFunction";
+                    string functionUrl = "https://release8086-data-function.azurewebsites.net/api/CompanyCommunicatorDataCleanUpFunction";
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, functionUrl);
                     string jsonPayload = JsonConvert.SerializeObject(deleteHistoricalMessage);
                     request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");

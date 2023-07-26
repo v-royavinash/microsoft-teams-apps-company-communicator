@@ -15,16 +15,16 @@ export const DeleteMessageDetail = (deletedMessages: any) => {
     <Table {...keyboardNavAttr} role='grid' aria-label={t('deletedMessagesGridNavigation') ?? ''}>
       <TableHeader>
         <TableRow>
-          <TableHeaderCell key='selectedDateRange'>
+          <TableHeaderCell key='selectedDateRange' style={{ width: '30%' }}>
             <b>{t('selectedDateRange')}</b>
           </TableHeaderCell>
-          <TableHeaderCell key='status'>
+          <TableHeaderCell key='status' style={{ width: '20%' }}>
             <b>{t('status')}</b>
           </TableHeaderCell>
-          <TableHeaderCell key='recordsDeleted'>
+          <TableHeaderCell key='recordsDeleted' style={{ width: '20%' }}>
             <b>{t('recordsDeleted')}</b>
           </TableHeaderCell>
-          <TableHeaderCell key='deletedBy'>
+          <TableHeaderCell key='deletedBy' style={{ width: '30%' }}>
             <b>{t('deletedBy')}</b>
           </TableHeaderCell>
         </TableRow>

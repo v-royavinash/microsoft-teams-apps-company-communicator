@@ -15,6 +15,7 @@ import { useAppDispatch } from '../../store';
 import { DraftMessages } from '../DraftMessages/draftMessages';
 import { SentMessages } from '../SentMessages/sentMessages';
 import { Header } from '../Shared/header';
+import { ScheduledMessages } from '../ScheduledMessages/scheduledMessages';
 
 interface IHomePage {
   theme: Theme;
@@ -59,7 +60,7 @@ export const HomePage = (props: IHomePage) => {
 
   const hasDeletePermission = () => {
     const authorizedUsers = process.env.REACT_APP_AUTHORIZED_USERS_EMAIL;
-    return currentUser ? authorizedUsers?.toLowerCase()?.includes(currentUser) : true;
+    return currentUser ? authorizedUsers?.toLowerCase()?.includes(currentUser) : false;
   };
 
   return (
@@ -72,14 +73,22 @@ export const HomePage = (props: IHomePage) => {
         {t('DeleteMessages')}
       </Button>
       }
-      <Accordion defaultOpenItems={['1', '2']} multiple collapsible>
+      <Accordion defaultOpenItems={['1', '2', '3']} multiple collapsible>
         <AccordionItem value='1' key='draftMessagesKey'>
           <AccordionHeader><Body1Stronger>{t('DraftMessagesSectionTitle')}</Body1Stronger></AccordionHeader>
           <AccordionPanel className='cc-accordion-panel'>
             <DraftMessages />
           </AccordionPanel>
         </AccordionItem>
-        <AccordionItem value='2' key='sentMessagesKey'>
+        <AccordionItem value='2' key='scheduledMessagesKey'>
+          <AccordionHeader>
+          <Body1Stronger>{t('ScheduledMessagesSectionTitle')}</Body1Stronger>
+          </AccordionHeader>
+          <AccordionPanel className='cc-accordion-panel'>
+            <ScheduledMessages />
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem value='3' key='sentMessagesKey'>
           <AccordionHeader><Body1Stronger>{t('SentMessagesSectionTitle')}</Body1Stronger></AccordionHeader>
           <AccordionPanel className='cc-accordion-panel'>
             <SentMessages />

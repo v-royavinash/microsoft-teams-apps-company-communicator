@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import { Button, Caption1Stronger, Text, Body1Stronger } from '@fluentui/react-components';
+import { Button, Caption1Stronger, Text, Body1Stronger, Spinner } from '@fluentui/react-components';
 import { dialog } from '@microsoft/teams-js';
 import { deleteMessages } from '../../apis/messageListApi';
 import { useAppDispatch } from '../../store';
@@ -16,6 +16,7 @@ export const DeleteConfirmationTask = () => {
   const { deletionType, deletionFromDate, deletionToDate } = useParams() as any;
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const [showDeletingSpinner, setShowDeletingSpinner] = React.useState(false);
 
   const onBack = () => {
     dialog.url.submit();
@@ -37,10 +38,12 @@ export const DeleteConfirmationTask = () => {
     } else if (deletionType.toLowerCase() === 'last1year') {
       fromDate = moment().subtract(1, 'year').format('MM/DD/YYYY');
     }
+    setShowDeletingSpinner(true);
 
     const payload: IDeleteMessageRequest = { selectedDateRange: deletionType, startDate: fromDate, endDate: toDate };
 
     void deleteMessages(payload).then(() => {
+      setShowDeletingSpinner(false);
       GetDeletedMessagesSilentAction(dispatch);
       dialog.url.submit();
     });
@@ -70,10 +73,19 @@ export const DeleteConfirmationTask = () => {
       <div className='fixed-footer'>
         <div className='footer-action-right'>
           <div className='footer-actions-flex'>
-            <Button onClick={onBack} style={{ marginLeft: '16px' }} appearance='secondary'>
+            {showDeletingSpinner && (
+                    <Spinner
+                      role='alert'
+                      id='deletingLoader'
+                      size='small'
+                      label={t('DeletingMessagesLabel')}
+                      labelPosition='after'
+                    />
+            )}
+            <Button onClick={onBack} style={{ marginLeft: '16px' }} appearance='secondary' disabled={showDeletingSpinner} >
               {t('Back')}
             </Button>
-            <Button onClick={onDelete} style={{ marginLeft: '16px' }} appearance='primary'>
+            <Button onClick={onDelete} style={{ marginLeft: '16px' }} appearance='primary' disabled={showDeletingSpinner}>
               {t('delete')}
             </Button>
           </div>

@@ -17,6 +17,8 @@ export interface MessagesState {
   isSentMessagesFetchOn: { action: string; payload: boolean };
   isDeletedMessagesFetchOn: { action: string; payload: boolean };
   hostClientType: { action: string; payload?: HostClientType };
+  scheduledMessages: { action: string; payload: [] };
+  isScheduledMessagesFetchOn: { action: string; payload: boolean };
 }
 
 const initialState: MessagesState = {
@@ -32,6 +34,8 @@ const initialState: MessagesState = {
   isSentMessagesFetchOn: { action: 'SENT_MESSAGES_FETCH_STATUS', payload: false },
   isDeletedMessagesFetchOn: { action: 'DELETED_MESSAGES_FETCH_STATUS', payload: false },
   hostClientType: { action: 'HOST_CLIENT_TYPE' },
+  scheduledMessages: { action: 'FETCH_SCHEDULED_MESSAGES', payload: [] },
+  isScheduledMessagesFetchOn: { action: 'SCHEDULED_MESSAGES_FETCH_STATUS', payload: false },
 };
 
 export const messagesSlice = createSlice({
@@ -74,6 +78,12 @@ export const messagesSlice = createSlice({
     hostClientType: (state, action) => {
       state.hostClientType = action.payload;
     },
+    scheduledMessages: (state, action) => {
+      state.scheduledMessages = action.payload;
+    },
+    isScheduledMessagesFetchOn: (state, action) => {
+      state.isScheduledMessagesFetchOn = action.payload;
+    },
   },
 });
 
@@ -90,6 +100,8 @@ export const {
   isSentMessagesFetchOn,
   isDeletedMessagesFetchOn,
   hostClientType,
+  scheduledMessages,
+  isScheduledMessagesFetchOn,
 } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

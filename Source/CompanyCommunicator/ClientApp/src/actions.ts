@@ -9,6 +9,7 @@ import {
   getTeams,
   searchGroups,
   verifyGroupAccess,
+  getScheduledDraftNotifications,
 } from './apis/messageListApi';
 import { formatDate } from './i18n';
 import {
@@ -23,6 +24,8 @@ import {
   sentMessages,
   teamsData,
   verifyGroup,
+  isScheduledMessagesFetchOn,
+  scheduledMessages,
 } from './messagesSlice';
 import { store } from './store';
 
@@ -39,6 +42,7 @@ interface Notification {
   title: string;
   totalMessageCount: number;
   createdBy: string;
+  scheduledDate: string;
 }
 
 export const SelectedMessageAction = (dispatch: typeof store.dispatch, payload: any) => {
@@ -86,6 +90,23 @@ export const GetDraftMessagesAction = (dispatch: typeof store.dispatch) => {
 export const GetDraftMessagesSilentAction = (dispatch: typeof store.dispatch) => {
   void getDraftNotifications().then((response) => {
     dispatch(draftMessages({ type: 'FETCH_DRAFT_MESSAGES', payload: response || [] }));
+  });
+};
+
+export const GetScheduledMessagesAction = (dispatch: typeof store.dispatch) => {
+  ScheduledMessageFetchStatusAction(dispatch, true);
+  getScheduledDraftNotifications()
+    .then((response) => {
+      dispatch(scheduledMessages({ type: 'FETCH_SCHEDULED_MESSAGES', payload: response || [] }));
+    })
+    .finally(() => {
+      ScheduledMessageFetchStatusAction(dispatch, false);
+    });
+};
+
+export const GetScheduledMessagesSilentAction = (dispatch: typeof store.dispatch) => {
+  void getScheduledDraftNotifications().then((response) => {
+    dispatch(scheduledMessages({ type: 'FETCH_SCHEDULED_MESSAGES', payload: response || [] }));
   });
 };
 
@@ -159,4 +180,8 @@ export const DeletedMessageFetchStatusAction = (dispatch: typeof store.dispatch,
 
 export const SentMessageFetchStatusAction = (dispatch: typeof store.dispatch, payload: boolean) => {
   dispatch(isSentMessagesFetchOn({ type: 'SENT_MESSAGES_FETCH_STATUS', payload }));
+};
+
+export const ScheduledMessageFetchStatusAction = (dispatch: typeof store.dispatch, payload: boolean) => {
+  dispatch(isScheduledMessagesFetchOn({ type: 'SCHEDULED_MESSAGES_FETCH_STATUS', payload }));
 };

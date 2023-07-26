@@ -106,3 +106,8 @@ export const getAuthenticationConsentMetadata = async (windowLocationOriginDomai
   const url = `${baseAxiosUrl}/authenticationMetadata/consentUrl?windowLocationOriginDomain=${windowLocationOriginDomain}&loginhint=${loginHint}`;
   return await apiCall.getJsonResponse(url);
 };
+
+export const getScheduledDraftNotifications = async (): Promise<any> => {
+  const url = baseAxiosUrl + '/draftnotifications/scheduledDrafts';
+  return await apiCall.getJsonResponse(url);
+};

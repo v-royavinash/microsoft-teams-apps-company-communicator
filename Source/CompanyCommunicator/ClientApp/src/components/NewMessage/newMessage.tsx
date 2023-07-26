@@ -2,6 +2,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import './newMessage.scss';
 import * as AdaptiveCards from 'adaptivecards';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,15 +28,32 @@ import {
   Textarea,
   tokens,
   useId,
+  Checkbox,
 } from '@fluentui/react-components';
 import { InfoLabel } from '@fluentui/react-components/unstable';
+import { TimePicker, DatePicker, IComboBox } from '@fluentui/react';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
 import { ArrowUpload24Regular, Dismiss12Regular } from '@fluentui/react-icons';
 import { dialog } from '@microsoft/teams-js';
-import { GetDraftMessagesSilentAction, GetGroupsAction, GetTeamsDataAction, SearchGroupsAction, VerifyGroupAccessAction } from '../../actions';
+import {
+  GetDraftMessagesSilentAction,
+  GetGroupsAction,
+  GetTeamsDataAction,
+  SearchGroupsAction,
+  VerifyGroupAccessAction,
+  GetScheduledMessagesSilentAction,
+} from '../../actions';
 import { createDraftNotification, getDraftNotification, updateDraftNotification } from '../../apis/messageListApi';
 import { getBaseUrl } from '../../configVariables';
 import { RootState, useAppDispatch, useAppSelector } from '../../store';
-import { getInitAdaptiveCard, setCardAuthor, setCardBtn, setCardImageLink, setCardSummary, setCardTitle } from '../AdaptiveCard/adaptiveCard';
+import {
+  getInitAdaptiveCard,
+  setCardAuthor,
+  setCardBtn,
+  setCardImageLink,
+  setCardSummary,
+  setCardTitle,
+} from '../AdaptiveCard/adaptiveCard';
 
 const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'];
 
@@ -51,6 +69,8 @@ interface IMessageState {
   rosters: any[];
   groups: any[];
   allUsers: boolean;
+  isScheduled?: boolean;
+  scheduledDate?: string;
 }
 
 interface ITeamTemplate {
@@ -101,6 +121,8 @@ let card: any;
 
 const MAX_SELECTED_TEAMS_NUM: number = 20;
 
+initializeIcons(/* optional base url */);
+
 export const NewMessage = () => {
   const fileInput = React.createRef<any>();
   const { t } = useTranslation();
@@ -134,27 +156,42 @@ export const NewMessage = () => {
   const [teamsSelectedOptions, setTeamsSelectedOptions] = React.useState<ITeamTemplate[]>([]);
   const [rostersSelectedOptions, setRostersSelectedOptions] = React.useState<ITeamTemplate[]>([]);
   const [searchSelectedOptions, setSearchSelectedOptions] = React.useState<ITeamTemplate[]>([]);
+  const [scheduleSendCheckBox, setScheduleSendCheckBox] = React.useState(false);
+  const [scheduledDatePicker, setScheduledDatePicker] = React.useState(
+    new Date(new Date().setMinutes(new Date().getMinutes() + 30))
+  );
+  const [scheduledTimePicker, setScheduledTimePicker] = React.useState(
+    new Date(new Date().setMinutes(new Date().getMinutes() + 30))
+  );
+  const [dbscheduledDate, setDbscheduledDate] = React.useState('');
+  const [scheduledSendValidation, setscheduledSendValidation] = React.useState(true);
+  const [scheduledSendTimeValidation, setscheduledSendTimeValidation] = React.useState(false);
 
   React.useEffect(() => {
     GetTeamsDataAction(dispatch);
     VerifyGroupAccessAction(dispatch);
   }, []);
 
-  React.useEffect(
-    () => {
-      if (!messageState.title && !messageState.imageLink && !messageState.summary && !messageState.author && !messageState.buttonTitle && !messageState.buttonLink) {
-        card = getInitAdaptiveCard(t('TitleText') ?? '');
-        setDefaultCard(card);
-      } else {
-        setCardTitle(card, messageState.title);
-        setCardImageLink(card, messageState.imageLink);
-        setCardSummary(card, messageState.summary);
-        setCardAuthor(card, messageState.author);
-        setCardBtn(card, messageState.buttonTitle, messageState.buttonLink);
-      }
-      updateAdaptiveCard();
-    },
-    [t, pageSelection, messageState]);
+  React.useEffect(() => {
+    if (
+      !messageState.title &&
+      !messageState.imageLink &&
+      !messageState.summary &&
+      !messageState.author &&
+      !messageState.buttonTitle &&
+      !messageState.buttonLink
+    ) {
+      card = getInitAdaptiveCard(t('TitleText') ?? '');
+      setDefaultCard(card);
+    } else {
+      setCardTitle(card, messageState.title);
+      setCardImageLink(card, messageState.imageLink);
+      setCardSummary(card, messageState.summary);
+      setCardAuthor(card, messageState.author);
+      setCardBtn(card, messageState.buttonTitle, messageState.buttonLink);
+    }
+    updateAdaptiveCard();
+  }, [t, pageSelection, messageState]);
 
   React.useEffect(() => {
     if (id) {
@@ -183,6 +220,30 @@ export const NewMessage = () => {
     }
   }, [teams, groups, messageState.teams, messageState.rosters, messageState.allUsers, messageState.groups]);
 
+  React.useEffect(() => {
+    let currentDateTime = new Date();
+    currentDateTime = new Date(currentDateTime.setMinutes(currentDateTime.getMinutes() + 30));
+    if (scheduleSendCheckBox) {
+      if (messageState.scheduledDate === undefined) {
+        setscheduledSendValidation(false);
+      } else if (
+        messageState.scheduledDate &&
+        new Date(messageState.scheduledDate) <= new Date(currentDateTime.toISOString())
+      ) {
+        setscheduledSendValidation(false);
+        setscheduledSendTimeValidation(true);
+      } else if (
+        messageState.scheduledDate &&
+        new Date(messageState.scheduledDate) > new Date(currentDateTime.toISOString())
+      ) {
+        setscheduledSendValidation(true);
+        setscheduledSendTimeValidation(false);
+      }
+    } else {
+      setscheduledSendValidation(true);
+    }
+  }, [scheduleSendCheckBox, messageState.scheduledDate, scheduledSendValidation]);
+
   const getDraftNotificationItem = async (id: number) => {
     try {
       await getDraftNotification(id).then((response) => {
@@ -210,7 +271,17 @@ export const NewMessage = () => {
           rosters: draftMessageDetail.rosters,
           groups: draftMessageDetail.groups,
           allUsers: draftMessageDetail.allUsers,
+          isScheduled: draftMessageDetail.isScheduled,
+          scheduledDate: draftMessageDetail.scheduledDate,
         });
+        setScheduleSendCheckBox(draftMessageDetail.isScheduled);
+        if (draftMessageDetail.scheduledDate !== null) {
+          setScheduledDatePicker(new Date(draftMessageDetail.scheduledDate));
+          setScheduledTimePicker(new Date(draftMessageDetail.scheduledDate));
+          setDbscheduledDate(draftMessageDetail.scheduledDate);
+        } else {
+          initializeTimePicker();
+        }
       });
     } catch (error) {
       return error;
@@ -228,6 +299,58 @@ export const NewMessage = () => {
     setCardSummary(card, summaryAsString);
     setCardAuthor(card, authorAsString);
     setCardBtn(card, buttonTitleAsString, 'https://adaptivecards.io');
+  };
+
+  const initializeTimePicker = () => {
+    setScheduledDatePicker(new Date(new Date().setMinutes(new Date().getMinutes() + 30)));
+    setScheduledTimePicker(new Date(new Date().setMinutes(new Date().getMinutes() + 30)));
+  };
+
+  // update the state variable whenever the checkbox is checked or unchecked
+  const handleScheduleSendCheckBox = (event: any) => {
+    setScheduleSendCheckBox((scheduleSendCheckBox) => !scheduleSendCheckBox);
+    if (event.target.checked) {
+      setMessageState({ ...messageState, isScheduled: true });
+    } else {
+      setMessageState({ ...messageState, isScheduled: false });
+      if (messageState.scheduledDate) {
+        setMessageState((current) => {
+          const { scheduledDate, ...messageState } = current;
+          return messageState;
+        });
+      }
+      initializeTimePicker();
+    }
+  };
+
+  // update the state variable whenever the date is changed in the date picker control
+  const handleScheduleSendDate = (selectedDate: Date | null | undefined) => {
+    if (selectedDate) {
+      setScheduledDatePicker(selectedDate);
+      if (scheduledTimePicker && selectedDate !== scheduledTimePicker) {
+        selectedDate?.setHours(scheduledTimePicker.getHours());
+        selectedDate?.setMinutes(scheduledTimePicker.getMinutes());
+        selectedDate?.setSeconds(scheduledTimePicker.getSeconds());
+        setScheduledTimePicker(selectedDate);
+      }
+    }
+    if (dbscheduledDate && selectedDate !== new Date(dbscheduledDate)) {
+      const tempDate = selectedDate;
+      tempDate?.setHours(scheduledTimePicker.getHours());
+      tempDate?.setMinutes(scheduledTimePicker.getMinutes());
+      tempDate?.setSeconds(scheduledTimePicker.getSeconds());
+      setMessageState({ ...messageState, scheduledDate: tempDate?.toISOString() });
+    }
+  };
+  // update the state variable whenever the time is changed in the time picker control
+  const handleScheduleSendTime = (_ev: React.FormEvent<IComboBox>, selectedTime: Date) => {
+    if (selectedTime) {
+      if (scheduledDatePicker && selectedTime !== scheduledDatePicker) {
+        selectedTime?.setDate(scheduledTimePicker.getDate());
+      }
+      setScheduledTimePicker(selectedTime);
+      setMessageState({ ...messageState, scheduledDate: selectedTime.toISOString() });
+    }
   };
 
   const updateAdaptiveCard = () => {
@@ -319,7 +442,7 @@ export const NewMessage = () => {
       (searchSelectedOptions.length > 0 && selectedRadioButton === AudienceSelection.Groups) ||
       selectedRadioButton === AudienceSelection.AllUsers;
 
-    if (msgPageConditions && audPageConditions) {
+    if (msgPageConditions && audPageConditions && scheduledSendValidation) {
       return false;
     } else {
       return true;
@@ -341,10 +464,14 @@ export const NewMessage = () => {
     let finalAllUsers: boolean = false;
 
     if (selectedRadioButton === AudienceSelection.Teams) {
-      finalSelectedTeams = [...teams.filter((t1) => teamsSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id)];
+      finalSelectedTeams = [
+        ...teams.filter((t1) => teamsSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id),
+      ];
     }
     if (selectedRadioButton === AudienceSelection.Rosters) {
-      finalSelectedRosters = [...teams.filter((t1) => rostersSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id)];
+      finalSelectedRosters = [
+        ...teams.filter((t1) => rostersSelectedOptions.some((sp) => sp.id === t1.id)).map((t2) => t2.id),
+      ];
     }
     if (selectedRadioButton === AudienceSelection.Groups) {
       finalSelectedGroups = [...searchSelectedOptions.map((g) => g.id)];
@@ -374,7 +501,11 @@ export const NewMessage = () => {
     try {
       updateDraftNotification(msg)
         .then(() => {
-          GetDraftMessagesSilentAction(dispatch);
+          if (msg.isScheduled) {
+            GetScheduledMessagesSilentAction(dispatch);
+          } else {
+            GetDraftMessagesSilentAction(dispatch);
+          }
         })
         .finally(() => {
           setShowMsgDraftingSpinner(false);
@@ -389,7 +520,11 @@ export const NewMessage = () => {
     try {
       createDraftNotification(msg)
         .then(() => {
-          GetDraftMessagesSilentAction(dispatch);
+          if (msg.isScheduled) {
+            GetScheduledMessagesSilentAction(dispatch);
+          } else {
+            GetDraftMessagesSilentAction(dispatch);
+          }
         })
         .finally(() => {
           setShowMsgDraftingSpinner(false);
@@ -402,6 +537,10 @@ export const NewMessage = () => {
 
   const onNext = (event: any) => {
     setPageSelection(CurrentPageSelection.AudienceSelection);
+  };
+
+  const onCancel = (event: any) => {
+    dialog.url.submit();
   };
 
   const onBack = (event: any) => {
@@ -458,7 +597,10 @@ export const NewMessage = () => {
   };
 
   const onBtnLinkChanged = (event: any) => {
-    if (validator.isURL(event.target.value, { require_protocol: true, protocols: ['https'] }) || event.target.value === '') {
+    if (
+      validator.isURL(event.target.value, { require_protocol: true, protocols: ['https'] }) ||
+      event.target.value === ''
+    ) {
       setBtnLinkErrorMessage('');
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -555,8 +697,10 @@ export const NewMessage = () => {
   };
 
   const teamsLabelledBy = teamsSelectedOptions.length > 0 ? `${teamsComboId} ${teamsSelectedListId}` : teamsComboId;
-  const rostersLabelledBy = rostersSelectedOptions.length > 0 ? `${rostersComboId} ${rostersSelectedListId}` : rostersComboId;
-  const searchLabelledBy = searchSelectedOptions.length > 0 ? `${searchComboId} ${searchSelectedListId}` : searchComboId;
+  const rostersLabelledBy =
+    rostersSelectedOptions.length > 0 ? `${rostersComboId} ${rostersSelectedListId}` : rostersComboId;
+  const searchLabelledBy =
+    searchSelectedOptions.length > 0 ? `${searchComboId} ${searchSelectedListId}` : searchComboId;
 
   const cmbStyles = useComboboxStyles();
   const fieldStyles = useFieldStyles();
@@ -582,7 +726,13 @@ export const NewMessage = () => {
           <span role='alert' aria-label={t('NewMessageStep1') ?? ''} />
           <div className='adaptive-task-grid'>
             <div className='form-area'>
-              <Field size='large' className={fieldStyles.styles} label={t('TitleText')} required={true} validationMessage={titleErrorMessage}>
+              <Field
+                size='large'
+                className={fieldStyles.styles}
+                label={t('TitleText')}
+                required={true}
+                validationMessage={titleErrorMessage}
+              >
                 <Input
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                   placeholder={t('PlaceHolderTitle')!}
@@ -621,14 +771,27 @@ export const NewMessage = () => {
                     appearance='filled-darker'
                     value={imageFileName || ''}
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    placeholder={t('ImageURL')!}
+                    placeholder={t('PlaceHolderImageURL')!}
                     onChange={onImageLinkChanged}
                   />
+                  <div
+                    style={{
+                      gridColumn: '2',
+                      marginLeft: '8px',
+                      marginRight: '5px',
+                      paddingTop: '8px',
+                      color: 'darkgray',
+                    }}
+                    placeholder="{t('FieldSeperator')}"
+                  >
+                    {' '}
+                    (Or){' '}
+                  </div>
                   {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
                     // @ts-ignore
                     <Button
-                      style={{ gridColumn: '2', marginLeft: '5px' }}
+                      style={{ gridColumn: '3', marginLeft: '5px' }}
                       onClick={handleUploadClick}
                       size='large'
                       appearance='secondary'
@@ -656,7 +819,7 @@ export const NewMessage = () => {
                   resize='vertical'
                   appearance='filled-darker'
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  placeholder={t('Summary')!}
+                  placeholder={t('PlaceHolderSummary')!}
                   value={messageState.summary ?? ''}
                   onChange={onSummaryChanged}
                 />
@@ -664,7 +827,7 @@ export const NewMessage = () => {
               <Field size='large' className={fieldStyles.styles} label={t('Author')}>
                 <Input
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  placeholder={t('Author')!}
+                  placeholder={t('PlaceHolderAuthor')!}
                   size='large'
                   onChange={onAuthorChanged}
                   autoComplete='off'
@@ -676,18 +839,23 @@ export const NewMessage = () => {
                 <Input
                   size='large'
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  placeholder={t('ButtonTitle')!}
+                  placeholder={t('PlaceHolderButtonTitle')!}
                   onChange={onBtnTitleChanged}
                   autoComplete='off'
                   appearance='filled-darker'
                   value={messageState.buttonTitle ?? ''}
                 />
               </Field>
-              <Field size='large' className={fieldStyles.styles} label={t('ButtonURL')} validationMessage={btnLinkErrorMessage}>
+              <Field
+                size='large'
+                className={fieldStyles.styles}
+                label={t('ButtonURL')}
+                validationMessage={btnLinkErrorMessage}
+              >
                 <Input
                   size='large'
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  placeholder={t('ButtonURL')!}
+                  placeholder={t('PlaceHolderButtonURL')!}
                   onChange={onBtnLinkChanged}
                   type='url'
                   autoComplete='off'
@@ -704,6 +872,9 @@ export const NewMessage = () => {
           </div>
           <div className='fixed-footer'>
             <div className='footer-action-right'>
+              <Button id='cancelBtn' onClick={onCancel} appearance='secondary' style={{ marginRight: '16px' }}>
+                {t('Cancel')}
+              </Button>
               <Button disabled={isNextBtnDisabled()} id='saveBtn' onClick={onNext} appearance='primary'>
                 {t('Next')}
               </Button>
@@ -714,12 +885,16 @@ export const NewMessage = () => {
       {pageSelection === CurrentPageSelection.AudienceSelection && (
         <>
           <span role='alert' aria-label={t('NewMessageStep2') ?? ''} />
-          <div className='adaptive-task-grid'>
+          <div className='adaptive-task-grid new-messages'>
             <div className='form-area'>
               <Label size='large' id='audienceSelectionGroupLabelId'>
                 {t('SendHeadingText')}
               </Label>
-              <RadioGroup defaultValue={selectedRadioButton} aria-labelledby='audienceSelectionGroupLabelId' onChange={audienceSelectionChange}>
+              <RadioGroup
+                defaultValue={selectedRadioButton}
+                aria-labelledby='audienceSelectionGroupLabelId'
+                onChange={audienceSelectionChange}
+              >
                 <Radio id='radio1' value={AudienceSelection.Teams} label={t('SendToGeneralChannel')} />
                 {selectedRadioButton === AudienceSelection.Teams && (
                   <div className={cmbStyles.root}>
@@ -745,7 +920,11 @@ export const NewMessage = () => {
                                 id={`${teamsComboId}-remove-${i}`}
                                 aria-labelledby={`${teamsComboId}-remove ${teamsComboId}-remove-${i}`}
                               >
-                                <Persona name={option.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
+                                <Persona
+                                  name={option.name}
+                                  secondaryText={'Team'}
+                                  avatar={{ shape: 'square', color: 'colorful' }}
+                                />
                               </Button>
                             </li>
                           ))}
@@ -767,7 +946,11 @@ export const NewMessage = () => {
                     >
                       {teams.map((opt) => (
                         <Option text={opt.name} value={opt.id} key={opt.id}>
-                          <Persona name={opt.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
+                          <Persona
+                            name={opt.name}
+                            secondaryText={'Team'}
+                            avatar={{ shape: 'square', color: 'colorful' }}
+                          />
                         </Option>
                       ))}
                     </Combobox>
@@ -798,7 +981,11 @@ export const NewMessage = () => {
                                 id={`${rostersComboId}-remove-${i}`}
                                 aria-labelledby={`${rostersComboId}-remove ${rostersComboId}-remove-${i}`}
                               >
-                                <Persona name={option.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
+                                <Persona
+                                  name={option.name}
+                                  secondaryText={'Team'}
+                                  avatar={{ shape: 'square', color: 'colorful' }}
+                                />
                               </Button>
                             </li>
                           ))}
@@ -820,7 +1007,11 @@ export const NewMessage = () => {
                     >
                       {teams.map((opt) => (
                         <Option text={opt.name} value={opt.id} key={opt.id}>
-                          <Persona name={opt.name} secondaryText={'Team'} avatar={{ shape: 'square', color: 'colorful' }} />
+                          <Persona
+                            name={opt.name}
+                            secondaryText={'Team'}
+                            avatar={{ shape: 'square', color: 'colorful' }}
+                          />
                         </Option>
                       ))}
                     </Combobox>
@@ -866,7 +1057,11 @@ export const NewMessage = () => {
                                     id={`${searchComboId}-remove-${i}`}
                                     aria-labelledby={`${searchComboId}-remove ${searchComboId}-remove-${i}`}
                                   >
-                                    <Persona name={option.name} secondaryText={'Group'} avatar={{ color: 'colorful' }} />
+                                    <Persona
+                                      name={option.name}
+                                      secondaryText={'Group'}
+                                      avatar={{ color: 'colorful' }}
+                                    />
                                   </Button>
                                 </li>
                               ))}
@@ -897,6 +1092,65 @@ export const NewMessage = () => {
                   </div>
                 )}
               </RadioGroup>
+              <div>
+                <></>
+              </div>
+              <div>
+                <Label size='large' id='MoreOptionsLabelId'>
+                  {t('MoreOptions')}
+                </Label>
+              </div>
+              <Checkbox
+                id='ScheduleCheckbox'
+                label={t('ScheduleSend')}
+                defaultChecked={scheduleSendCheckBox}
+                onChange={handleScheduleSendCheckBox}
+              />
+              {scheduleSendCheckBox && (
+                <div>
+                  <Label
+                    id='ScheduleSection'
+                    className='info-text'
+                    style={{ marginBottom: '5px', display: 'block', marginLeft: '36px' }}
+                  >
+                    {t('ScheduleSection')}
+                  </Label>
+                  <Text
+                    id='ScheduleNote'
+                    className='info-text'
+                    style={{ marginBottom: '5px', display: 'block', marginLeft: '36px' }}
+                  >
+                    {t('ScheduleNote')}
+                  </Text>
+                  <div className='flex-container schedulesend-datetime'>
+                    <DatePicker
+                      value={scheduledDatePicker}
+                      onSelectDate={handleScheduleSendDate}
+                      minDate={new Date()}
+                      placeholder='Select a date'
+                      ariaLabel={'Scheduled Date required'}
+                      className='schedule-datepicker'
+                      calloutProps={{ className: 'incidentdatepicker-callout' }}
+                    />
+                    <TimePicker
+                      dateAnchor={scheduledDatePicker}
+                      value={scheduledTimePicker}
+                      placeholder='Select a time'
+                      onChange={handleScheduleSendTime}
+                      calloutProps={{ directionalHintFixed: true, doNotLayer: true }}
+                      ariaLabel={'Scheduled Time required'}
+                      className='schedule-timepicker'
+                      useHour12={true}
+                      allowFreeform={false}
+                    />
+                  </div>
+                  {scheduledSendTimeValidation && (
+                    <div className='validationText'>
+                      <Text role='alert'>{t('ScheduleTimeValidation')}</Text>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className='card-area'>
               <div className={cardAreaBorderClass}>
@@ -917,7 +1171,13 @@ export const NewMessage = () => {
                       labelPosition='after'
                     />
                   )}
-                  <Button id='backBtn' style={{ marginLeft: '16px' }} onClick={onBack} disabled={showMsgDraftingSpinner} appearance='secondary'>
+                  <Button
+                    id='backBtn'
+                    style={{ marginLeft: '16px' }}
+                    onClick={onBack}
+                    disabled={showMsgDraftingSpinner}
+                    appearance='secondary'
+                  >
                     {t('Back')}
                   </Button>
                   <Button
@@ -927,7 +1187,7 @@ export const NewMessage = () => {
                     onClick={onSave}
                     appearance='primary'
                   >
-                    {t('SaveAsDraft')}
+                    {scheduleSendCheckBox ? t('Schedule') : t('SaveAsDraft')}
                   </Button>
                 </div>
               </div>

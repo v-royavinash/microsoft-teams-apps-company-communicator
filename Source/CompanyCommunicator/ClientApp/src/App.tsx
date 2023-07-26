@@ -26,8 +26,8 @@ import { PreviewMessageConfirmation } from './components/PreviewMessageConfirmat
 export const App = () => {
   const [fluentUITheme, setFluentUITheme] = React.useState(teamsLightTheme);
   const [locale, setLocale] = React.useState('en-US');
-  const [appInitializationComplete, setAppInitializationComplete] = React.useState(true);
-  const [isAppReady, setIsAppReady] = React.useState(true);
+  const [appInitializationComplete, setAppInitializationComplete] = React.useState(false);
+  const [isAppReady, setIsAppReady] = React.useState(false);
   const hostType = useAppSelector((state: RootState) => state.messages).hostClientType.payload;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
   // @ts-ignore

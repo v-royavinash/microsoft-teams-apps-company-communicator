@@ -3,6 +3,7 @@
   "version": "5.4.1",
   "private": true,
   "dependencies": {
+    "@fluentui/react": "^8.110.3",
     "@fluentui/react-components": "^9.20.2",
     "@fluentui/react-datepicker-compat": "^0.1.4",
     "@fluentui/react-utilities": "^9.9.0",

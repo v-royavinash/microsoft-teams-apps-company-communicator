@@ -18,7 +18,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using Microsoft.Teams.Apps.CompanyCommunicator.Authentication;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.CleanUpHistory;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
+
     using Microsoft.Teams.Apps.CompanyCommunicator.Models;
     using Newtonsoft.Json;
 
@@ -151,6 +153,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 }
                 catch (Exception ex)
                 {
+                    await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
+                    {
+                        PartitionKey = "Delete Messages",
+                        RowKey = newId,
+                        SelectedDateRange = deleteHistoricalMessage.SelectedDateRange,
+                        RecordsDeleted = 0,
+                        DeletedBy = deleteHistoricalMessage.DeletedBy,
+                        Status = CleanUpStatus.Failed.ToString(),
+                        StartDate = deleteHistoricalMessage.StartDate,
+                        EndDate = deleteHistoricalMessage.EndDate,
+                    });
                     // Log the exception or handle
                     Console.WriteLine($"Exception in background task: {ex.Message}");
                 }
@@ -171,9 +184,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             {
                 var summary = new CleanUpHistoryEntity
                 {
-                    SelectedDateRange = notificationEntity.SelectedDateRange,
+                    SelectedDateRange = notificationEntity.SelectedDateRange.AddSpacesToCamelCase(),
                     DeletedBy = notificationEntity.DeletedBy,
-                    Status = notificationEntity.Status,
+                    Status = notificationEntity.Status.AddSpacesToCamelCase(),
                     RecordsDeleted = notificationEntity.RecordsDeleted,
                     Timestamp = notificationEntity.Timestamp,
                     StartDate = notificationEntity.StartDate,

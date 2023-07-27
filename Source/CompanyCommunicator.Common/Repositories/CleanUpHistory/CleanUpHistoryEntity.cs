@@ -5,7 +5,6 @@
 
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.CleanUpHistory
 {
-    using System;
     using Microsoft.Azure.Cosmos.Table;
 
     /// <summary>

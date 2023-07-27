@@ -60,7 +60,7 @@ export const HomePage = (props: IHomePage) => {
 
   const hasDeletePermission = () => {
     const authorizedUsers = process.env.REACT_APP_AUTHORIZED_USERS_EMAIL;
-    return currentUser ? authorizedUsers?.toLowerCase()?.includes(currentUser) : false;
+    return currentUser ? authorizedUsers?.toLowerCase().includes(currentUser.toLowerCase()) : false;
   };
 
   return (

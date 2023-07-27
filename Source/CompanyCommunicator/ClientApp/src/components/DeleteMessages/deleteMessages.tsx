@@ -27,6 +27,8 @@ import { Header } from '../Shared/header';
 import { DeleteMessageDetail } from './deleteMessagesDetail';
 import { GetDeletedMessagesAction, GetDeletedMessagesSilentAction } from '../../actions';
 import * as CustomHooks from '../../useInterval';
+import moment from 'moment';
+import { InfoLabel } from '@fluentui/react-components/unstable';
 
 interface IDeleteMessagesProps {
   theme: Theme;
@@ -80,6 +82,8 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
         return true;
       } else if (toDate < fromDate) {
         return true;
+      } else if (toDate > fromDate && moment(toDate).diff(moment(fromDate), 'days') > 180) {
+        return true;
       }
     }
     return false;
@@ -88,6 +92,9 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
   const getValidationErrorMsg = () => {
     if (deleteSelection === 'customDate' && fromDate && toDate && fromDate > toDate) {
       return t('invalidDateRange');
+    }
+    if (deleteSelection === 'customDate' && fromDate && toDate && toDate > fromDate && moment(toDate).diff(moment(fromDate), 'days') > 180) {
+      return t('CustomInvalidDateRange');
     }
     return '';
   };
@@ -118,12 +125,14 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
     <div className='delete-messages'>
       <Header theme={props.theme} />
       <Field validationMessage={getValidationErrorMsg()} label={t('chooseRangeOfDeleteMessagesTitle')} size='large' style={{ paddingTop: '32px' }}>
-        <RadioGroup onChange={deleteSelectionChange}>
+        <RadioGroup onChange={deleteSelectionChange} aria-labelledby='deleteSelectionGroupLabelId'>
           <Radio value='last30Days' label={t('last30Days')} />
           <Radio value='last3Months' label={t('last3Months')} />
           <Radio value='last6Months' label={t('last6Months')} />
-          <Radio value='last1Year' label={t('last1Year')} />
-          <Radio value='customDate' label={t('selectACustomDate')} />
+          <label>
+            <Radio value='customDate' label={t('selectACustomDate')} />
+            <InfoLabel style={{ marginTop: '7px', position: 'absolute' }} info={t('CustomDeleteInfoContent') ?? ''} />
+          </label>
           {deleteSelection === 'customDate' && (
             <div
               style={{
@@ -135,10 +144,10 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
               }}
             >
               <Field label={t('from')} style={{ gridColumn: '1' }}>
-                <DatePicker placeholder='Pick a from date' value={fromDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectFromDate} />
+                <DatePicker placeholder='Pick a from date' value={fromDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectFromDate} maxDate={new Date()} />
               </Field>
               <Field label={t('to')} style={{ gridColumn: '2' }}>
-                <DatePicker placeholder='Pick a to date' value={toDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectToDate} />
+                <DatePicker placeholder='Pick a to date' value={toDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectToDate} maxDate={new Date()} />
               </Field>
             </div>
           )}

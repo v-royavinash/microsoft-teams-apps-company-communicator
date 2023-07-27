@@ -35,8 +35,6 @@ export const DeleteConfirmationTask = () => {
       fromDate = moment().subtract(90, 'days').format('MM/DD/YYYY');
     } else if (deletionType.toLowerCase() === 'last6Months') {
       fromDate = moment().subtract(180, 'days').format('MM/DD/YYYY');
-    } else if (deletionType.toLowerCase() === 'last1year') {
-      fromDate = moment().subtract(1, 'year').format('MM/DD/YYYY');
     }
     setShowDeletingSpinner(true);
 
@@ -45,7 +43,9 @@ export const DeleteConfirmationTask = () => {
     void deleteMessages(payload).then(() => {
       setShowDeletingSpinner(false);
       GetDeletedMessagesSilentAction(dispatch);
-      dialog.url.submit();
+      setTimeout(() => {
+        dialog.url.submit();
+      }, 3000);
     });
   };
 
@@ -59,7 +59,6 @@ export const DeleteConfirmationTask = () => {
       {deletionType.toLowerCase() === 'last30days' && <Text>{t('last30Days')}</Text>}
       {deletionType.toLowerCase() === 'last3months' && <Text>{t('last3Months')}</Text>}
       {deletionType.toLowerCase() === 'last6months' && <Text>{t('last6Months')}</Text>}
-      {deletionType.toLowerCase() === 'last1year' && <Text>{t('last1Year')}</Text>}
       {deletionType.toLowerCase() === 'customdate' && (
         <Text>
           {t('from')}&nbsp;{deletionFromDate}&nbsp;{t('to')}&nbsp;{deletionToDate}

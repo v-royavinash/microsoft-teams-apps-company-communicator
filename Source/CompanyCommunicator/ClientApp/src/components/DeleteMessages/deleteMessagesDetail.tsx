@@ -46,7 +46,7 @@ export const DeleteMessageDetail = (deletedMessages: any) => {
             </TableCell>
             <TableCell tabIndex={0} role='gridcell'>
               <TableCellLayout truncate>
-                {item.recordsDeleted}
+              {item.recordsDeleted.toString()}
               </TableCellLayout>
             </TableCell>
             <TableCell tabIndex={0} role='gridcell'>

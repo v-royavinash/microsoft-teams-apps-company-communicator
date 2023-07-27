@@ -63,7 +63,7 @@ export const HomePage = (props: IHomePage) => {
     console.log(process.env.REACT_APP_AUTHORIZED_USERS_EMAIL);
     console.log(authorizedUsers);
     console.log(currentUser);
-    return currentUser ? authorizedUsers?.toLowerCase()?.includes(currentUser) : false;
+    return currentUser ? authorizedUsers?.toLowerCase().includes(currentUser.toLowerCase()) : false;
   };
 
   return (

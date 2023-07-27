@@ -102,7 +102,7 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
   const onDeleteApplyClick = () => {
     const url =
       getBaseUrl() +
-      `/${ROUTE_PARTS.DELETE_MESSAGES_CONFIRM}/${deleteSelection}/${fromDate ? fromDate.toDateString() : 'NoFromDate'}/${toDate ? toDate.toDateString() : 'NoToDate'
+        `/${ROUTE_PARTS.DELETE_MESSAGES_CONFIRM}/${deleteSelection}/${fromDate ? fromDate.toDateString() : 'NoFromDate'}/${toDate ? toDate.toDateString() : 'NoToDate'
       }`;
     const dialogInfo: UrlDialogInfo = {
       url,
@@ -144,10 +144,10 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
               }}
             >
               <Field label={t('from')} style={{ gridColumn: '1' }}>
-                <DatePicker placeholder='Pick a from date' value={fromDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectFromDate} maxDate={new Date()} />
+                <DatePicker placeholder='Pick a from date' value={fromDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectFromDate} />
               </Field>
               <Field label={t('to')} style={{ gridColumn: '2' }}>
-                <DatePicker placeholder='Pick a to date' value={toDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectToDate} maxDate={new Date()} />
+                <DatePicker placeholder='Pick a to date' value={toDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectToDate} />
               </Field>
             </div>
           )}

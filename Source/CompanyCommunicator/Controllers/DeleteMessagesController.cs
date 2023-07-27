@@ -184,7 +184,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             {
                 var summary = new CleanUpHistoryEntity
                 {
-                    SelectedDateRange = notificationEntity.SelectedDateRange.AddSpacesToCamelCase(),
+                    SelectedDateRange = notificationEntity.SelectedDateRange,
                     DeletedBy = notificationEntity.DeletedBy,
                     Status = notificationEntity.Status.AddSpacesToCamelCase(),
                     RecordsDeleted = notificationEntity.RecordsDeleted,

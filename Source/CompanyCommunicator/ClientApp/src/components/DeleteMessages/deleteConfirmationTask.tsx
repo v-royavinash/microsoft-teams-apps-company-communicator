@@ -38,7 +38,7 @@ export const DeleteConfirmationTask = () => {
     }
     setShowDeletingSpinner(true);
 
-    const payload: IDeleteMessageRequest = { rowKeyId:"", selectedDateRange: deletionType, startDate: fromDate, endDate: toDate };
+    const payload: IDeleteMessageRequest = { rowKeyId :'', selectedDateRange: deletionType, startDate: fromDate, endDate: toDate };
 
     void deleteMessages(payload).then(() => {
       setShowDeletingSpinner(false);

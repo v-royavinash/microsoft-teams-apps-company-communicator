@@ -40,14 +40,12 @@ export const DeleteConfirmationTask = () => {
 
     const payload: IDeleteMessageRequest = { rowKeyId: '', selectedDateRange: deletionType, startDate: fromDate, endDate: toDate };
 
-    void deleteMessages(payload).then(() => {
-      setShowDeletingSpinner(false);
-      GetDeletedMessagesSilentAction(dispatch);
-      setTimeout(() => {
-        dialog.url.submit();
-      }, 3000);
-    });
-  };
+      void deleteMessages(payload).then(async () => {
+          GetDeletedMessagesSilentAction(dispatch);
+          await new Promise((resolve) => setTimeout(resolve, 50000));
+          setShowDeletingSpinner(false);
+          dialog.url.submit();
+      });
 
   return (
     <>

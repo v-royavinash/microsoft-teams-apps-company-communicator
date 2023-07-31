@@ -59,49 +59,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        ///// <summary>
-        ///// Initiate the deletion of historical messages.
-        ///// </summary>
-        ///// <param name="deleteHistoricalMessage">delete historical message request.</param>
-        ///// <returns>The result of an action method.</returns>
-        //[HttpPost]
-        //public async Task<IActionResult> DeleteHistoricalMessagesAsync(
-        //    [FromBody] DeleteHistoricalMessages deleteHistoricalMessage)
-        //{
-        //    if (deleteHistoricalMessage == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(deleteHistoricalMessage));
-        //    }
-
-        //    await Task.WhenAll(
-        //       this.sentNotificationDataRepository.EnsureSentNotificationDataTableExistsAsync(),
-        //       this.cleanUpHistoryRepository.EnsureCleanUpHistoryTableExistsAsync());
-
-        //    var newId = this.tableRowKeyGenerator.CreateNewKeyOrderingMostRecentToOldest();
-        //    deleteHistoricalMessage.RowKeyId = newId;
-
-        //    await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
-        //    {
-        //        PartitionKey = "Delete Messages",
-        //        RowKey = newId,
-        //        SelectedDateRange = deleteHistoricalMessage.SelectedDateRange,
-        //        RecordsDeleted = 0,
-        //        DeletedBy = deleteHistoricalMessage.DeletedBy,
-        //        Status = CleanUpStatus.InProgress.ToString(),
-        //        StartDate = deleteHistoricalMessage.StartDate,
-        //        EndDate = deleteHistoricalMessage.EndDate,
-        //    });
-
-        //    var httpResponse = await this.httpClient.PutAsJsonAsync(this.configuration["DataFunctionUrl"], deleteHistoricalMessage);
-
-        //    if (!httpResponse.IsSuccessStatusCode)
-        //    {
-        //        throw new Exception($"Failed to send HTTP PUT request to Azure Function: {httpResponse.StatusCode}");
-        //    }
-
-        //    return await Task.FromResult<IActionResult>(this.Ok());
-        //}
-
         /// <summary>
         /// Initiate the deletion of historical messages.
         /// </summary>
@@ -164,8 +121,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                         StartDate = deleteHistoricalMessage.StartDate,
                         EndDate = deleteHistoricalMessage.EndDate,
                     });
-                    // Log the exception or handle
-                    Console.WriteLine($"Exception in background task: {ex.Message}");
                 }
             });
         }

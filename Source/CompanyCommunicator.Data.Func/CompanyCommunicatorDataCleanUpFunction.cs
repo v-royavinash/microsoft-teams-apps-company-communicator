@@ -86,82 +86,98 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
             string jsonContent = content.ReadAsStringAsync().Result;
             dynamic requestPram = JsonConvert.DeserializeObject<Models.DeleteMessage>(jsonContent);
 
-            // Validate the required param
-            if (string.IsNullOrEmpty(requestPram.RowKeyId))
+            try
             {
-                return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Row key Id");
+                // Validate the required param
+                if (string.IsNullOrEmpty(requestPram.RowKeyId))
+                {
+                    return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Row key Id");
+                }
+
+                if (string.IsNullOrEmpty(requestPram.SelectedDateRange))
+                {
+                    return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Selected Date Range");
+                }
+
+                if (string.IsNullOrEmpty(requestPram.DeletedBy))
+                {
+                    return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Deleted By");
+                }
+
+                if (string.IsNullOrEmpty(requestPram.StartDate))
+                {
+                    return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Start Date");
+                }
+
+                if (string.IsNullOrEmpty(requestPram.EndDate))
+                {
+                    return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the End Date");
+                }
+
+                await Task.WhenAll(
+                   this.sentNotificationDataRepository.EnsureSentNotificationDataTableExistsAsync(),
+                   this.cleanUpHistoryRepository.EnsureCleanUpHistoryTableExistsAsync());
+                this.tableRowKey = requestPram.RowKeyId;
+                await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
+                {
+                    PartitionKey = "Delete Messages",
+                    RowKey = requestPram.RowKeyId,
+                    SelectedDateRange = requestPram.SelectedDateRange,
+                    RecordsDeleted = 0,
+                    DeletedBy = requestPram.DeletedBy,
+                    Status = CleanUpStatus.InProgress.ToString(),
+                    StartDate = requestPram.StartDate,
+                    EndDate = requestPram.EndDate,
+                });
+
+                var inputStartDate = requestPram.StartDate;
+                var inputEndDate = requestPram.EndDate;
+                var fromDate = DateTimeOffset.ParseExact(inputStartDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                var toDate = DateTimeOffset.ParseExact(inputEndDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                await this.PurgeEntitiesAsync(fromDate, toDate, log, this.sentNotificationDataRepository.Table).ConfigureAwait(false);
+
+                await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
+                {
+                    PartitionKey = "Delete Messages",
+                    RowKey = requestPram.RowKeyId,
+                    SelectedDateRange = requestPram.SelectedDateRange,
+                    RecordsDeleted = this.totalDeletedRecords,
+                    DeletedBy = requestPram.DeletedBy,
+                    Status = CleanUpStatus.InProgress.ToString(),
+                    StartDate = requestPram.StartDate,
+                    EndDate = requestPram.EndDate,
+                });
+
+                await this.PurgeEntitiesAsync(fromDate, toDate, log, this.notificationDataRepository.Table).ConfigureAwait(false);
+                await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
+                {
+                    PartitionKey = "Delete Messages",
+                    RowKey = requestPram.RowKeyId,
+                    SelectedDateRange = requestPram.SelectedDateRange,
+                    RecordsDeleted = this.totalDeletedRecords,
+                    DeletedBy = requestPram.DeletedBy,
+                    Status = CleanUpStatus.Completed.ToString(),
+                    StartDate = requestPram.StartDate,
+                    EndDate = requestPram.EndDate,
+                });
+
+                return request.CreateResponse(HttpStatusCode.OK);
             }
-
-            if (string.IsNullOrEmpty(requestPram.SelectedDateRange))
+            catch (Exception)
             {
-                return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Selected Date Range");
+                await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
+                {
+                    PartitionKey = "Delete Messages",
+                    RowKey = requestPram.RowKeyId,
+                    SelectedDateRange = requestPram.SelectedDateRange,
+                    RecordsDeleted = this.totalDeletedRecords,
+                    DeletedBy = requestPram.DeletedBy,
+                    Status = CleanUpStatus.Failed.ToString(),
+                    StartDate = requestPram.StartDate,
+                    EndDate = requestPram.EndDate,
+                });
+                return request.CreateResponse(HttpStatusCode.InternalServerError);
             }
-
-            if (string.IsNullOrEmpty(requestPram.DeletedBy))
-            {
-                return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Deleted By");
-            }
-
-            if (string.IsNullOrEmpty(requestPram.StartDate))
-            {
-                return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the Start Date");
-            }
-
-            if (string.IsNullOrEmpty(requestPram.EndDate))
-            {
-                return request.CreateResponse(HttpStatusCode.BadRequest, "Error in getting the End Date");
-            }
-
-            await Task.WhenAll(
-               this.sentNotificationDataRepository.EnsureSentNotificationDataTableExistsAsync(),
-               this.cleanUpHistoryRepository.EnsureCleanUpHistoryTableExistsAsync());
-            this.tableRowKey = requestPram.RowKeyId;
-            await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
-            {
-                PartitionKey = "Delete Messages",
-                RowKey = requestPram.RowKeyId,
-                SelectedDateRange = requestPram.SelectedDateRange,
-                RecordsDeleted = 0,
-                DeletedBy = requestPram.DeletedBy,
-                Status = CleanUpStatus.InProgress.ToString(),
-                StartDate = requestPram.StartDate,
-                EndDate = requestPram.EndDate,
-            });
-
-            string inputStartDate = requestPram.StartDate;
-            string inputEndDate = requestPram.EndDate;
-            var fromDate = DateTimeOffset.ParseExact(inputStartDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            var toDate = DateTimeOffset.ParseExact(inputEndDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            //var fromDate = DateTimeOffset.ParseExact(inputStartDate, "ddd MMM dd yyyy", CultureInfo.InvariantCulture);
-            //var toDate = DateTimeOffset.ParseExact(inputEndDate, "ddd MMM dd yyyy", CultureInfo.InvariantCulture);
-            await this.PurgeEntitiesAsync(fromDate, toDate, log, this.sentNotificationDataRepository.Table).ConfigureAwait(false);
-
-            await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
-            {
-                PartitionKey = "Delete Messages",
-                RowKey = requestPram.RowKeyId,
-                SelectedDateRange = requestPram.SelectedDateRange,
-                RecordsDeleted = this.totalDeletedRecords,
-                DeletedBy = requestPram.DeletedBy,
-                Status = CleanUpStatus.InProgress.ToString(),
-                StartDate = requestPram.StartDate,
-                EndDate = requestPram.EndDate,
-            });
-
-            await this.PurgeEntitiesAsync(fromDate, toDate, log, this.notificationDataRepository.Table).ConfigureAwait(false);
-            await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
-            {
-                PartitionKey = "Delete Messages",
-                RowKey = requestPram.RowKeyId,
-                SelectedDateRange = requestPram.SelectedDateRange,
-                RecordsDeleted = this.totalDeletedRecords,
-                DeletedBy = requestPram.DeletedBy,
-                Status = CleanUpStatus.Completed.ToString(),
-                StartDate = requestPram.StartDate,
-                EndDate = requestPram.EndDate,
-            });
-
-            return request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>

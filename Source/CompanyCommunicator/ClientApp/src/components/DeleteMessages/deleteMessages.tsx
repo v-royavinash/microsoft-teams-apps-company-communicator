@@ -42,7 +42,7 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
   const deletedMessages = useAppSelector((state: RootState) => state.messages).deletedMessages.payload;
   const loader = useAppSelector((state: RootState) => state.messages).isDeletedMessagesFetchOn.payload;
   const dispatch = useAppDispatch();
-  const delay = 60000;
+  const delay = 5000;
 
   CustomHooks.useInterval(() => {
     GetDeletedMessagesSilentAction(dispatch);

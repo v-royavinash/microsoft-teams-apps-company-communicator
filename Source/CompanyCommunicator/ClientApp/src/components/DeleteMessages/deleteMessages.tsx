@@ -46,6 +46,7 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
 
   CustomHooks.useInterval(() => {
     GetDeletedMessagesSilentAction(dispatch);
+    console.log(delay);
   }, delay);
 
   React.useEffect(() => {

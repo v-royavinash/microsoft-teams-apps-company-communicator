@@ -96,7 +96,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             {
                 try
                 {
-                    string functionUrl = "https://release8086-data-function.azurewebsites.net/api/CompanyCommunicatorDataCleanUpFunction";
+                    //string functionUrl = "https://release8086-data-function.azurewebsites.net/api/CompanyCommunicatorDataCleanUpFunction";
+                    string functionUrl = "https://ba87-2401-4900-1c8f-dff-e50f-7cdf-6adb-65a8.ngrok-free.app/api/CompanyCommunicatorDataCleanUpFunction";
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, functionUrl);
                     string jsonPayload = JsonConvert.SerializeObject(deleteHistoricalMessage);
                     request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");

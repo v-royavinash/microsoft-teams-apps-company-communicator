@@ -98,7 +98,6 @@ export const getDeletedMessages = async (): Promise<any> => {
 };
 
 export const deleteMessages = async (payload: IDeleteMessageRequest): Promise<any> => {
-  console.log(payload);
   const url = baseAxiosUrl + '/deletemessages';
   return await apiCall.postAndGetJsonResponse(url, payload);
 };

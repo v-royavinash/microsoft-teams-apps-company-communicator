@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import '../Shared/main.scss';
+import './deleteMessage.scss';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -46,7 +47,6 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
 
   CustomHooks.useInterval(() => {
     GetDeletedMessagesSilentAction(dispatch);
-    console.log(delay);
   }, delay);
 
   React.useEffect(() => {
@@ -103,7 +103,7 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
   const onDeleteApplyClick = () => {
     const url =
       getBaseUrl() +
-        `/${ROUTE_PARTS.DELETE_MESSAGES_CONFIRM}/${deleteSelection}/${fromDate ? fromDate.toDateString() : 'NoFromDate'}/${toDate ? toDate.toDateString() : 'NoToDate'
+      `/${ROUTE_PARTS.DELETE_MESSAGES_CONFIRM}/${deleteSelection}/${fromDate ? fromDate.toDateString() : 'NoFromDate'}/${toDate ? toDate.toDateString() : 'NoToDate'
       }`;
     const dialogInfo: UrlDialogInfo = {
       url,
@@ -130,9 +130,9 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
           <Radio value='last30Days' label={t('last30Days')} />
           <Radio value='last3Months' label={t('last3Months')} />
           <Radio value='last6Months' label={t('last6Months')} />
-          <label>
+          <label className='customdaterangelabel'>
             <Radio value='customDate' label={t('selectACustomDate')} />
-            <InfoLabel style={{ marginTop: '7px', position: 'absolute' }} info={t('CustomDeleteInfoContent') ?? ''} />
+            <InfoLabel info={t('CustomDeleteInfoContent') ?? ''} />
           </label>
           {deleteSelection === 'customDate' && (
             <div
@@ -145,10 +145,10 @@ export const DeleteMessages = (props: IDeleteMessagesProps) => {
               }}
             >
               <Field label={t('from')} style={{ gridColumn: '1' }}>
-                <DatePicker placeholder='Pick a from date' value={fromDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectFromDate} />
+                <DatePicker placeholder='Pick a from date' value={fromDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectFromDate} maxDate={new Date()} />
               </Field>
               <Field label={t('to')} style={{ gridColumn: '2' }}>
-                <DatePicker placeholder='Pick a to date' value={toDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectToDate} />
+                <DatePicker placeholder='Pick a to date' value={toDate} style={{ maxWidth: '160px' }} onSelectDate={onSelectToDate} maxDate={new Date()} />
               </Field>
             </div>
           )}

@@ -22,6 +22,11 @@ export const DeleteConfirmationTask = () => {
     dialog.url.submit();
   };
 
+  const setDelay = () => {
+    setShowDeletingSpinner(false);
+    dialog.url.submit();
+  };
+
   const onDelete = () => {
     let fromDate = moment().format('MM/DD/YYYY');
     let toDate = moment().format('MM/DD/YYYY');
@@ -38,14 +43,22 @@ export const DeleteConfirmationTask = () => {
     }
     setShowDeletingSpinner(true);
 
-    const payload: IDeleteMessageRequest = { rowKeyId: '', selectedDateRange: deletionType, startDate: fromDate, endDate: toDate };
+    const payload: IDeleteMessageRequest = { selectedDateRange: deletionType, startDate: fromDate, endDate: toDate };
+    deleteHistoricalMessages(payload);
+  };
 
-    void deleteMessages(payload).then(async() => {
-      GetDeletedMessagesSilentAction(dispatch);
-      await new Promise((resolve) => setTimeout(resolve, 50000));
-      setShowDeletingSpinner(false);
-      dialog.url.submit();
-    });
+  const deleteHistoricalMessages = (payload: IDeleteMessageRequest) => {
+    try {
+      deleteMessages(payload)
+        .then(() => {
+          GetDeletedMessagesSilentAction(dispatch);
+        })
+        .finally(() => {
+          setTimeout(setDelay, 5000);
+        });
+    } catch (error) {
+      return error;
+    }
   };
 
   return (

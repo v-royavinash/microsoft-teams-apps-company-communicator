@@ -163,8 +163,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
 
                 return request.CreateResponse(HttpStatusCode.OK);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                log.LogError($"Exception occurred while purging data: {ex.Message}.");
                 await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
                 {
                     PartitionKey = "Delete Messages",

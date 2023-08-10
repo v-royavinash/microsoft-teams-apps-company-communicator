@@ -20,9 +20,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.CleanUpHistory;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
-
     using Microsoft.Teams.Apps.CompanyCommunicator.Models;
     using Newtonsoft.Json;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Controller for older deleting messages.
@@ -36,6 +36,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         private readonly TableRowKeyGenerator tableRowKeyGenerator;
         private readonly IHttpClientFactory clientFactory;
         private readonly IConfiguration configuration;
+        private readonly ILogger<DeleteMessagesController> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteMessagesController"/> class.
@@ -45,18 +46,21 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// <param name="tableRowKeyGenerator">Table row key generator service.</param>
         /// <param name="clientFactory">Http client service.</param>
         /// <param name="configuration">Configuration service.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
         public DeleteMessagesController(
             ICleanUpHistoryRepository cleanUpHistoryRepository,
             ISentNotificationDataRepository sentNotificationDataRepository,
             TableRowKeyGenerator tableRowKeyGenerator,
             IHttpClientFactory clientFactory,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory)
         {
             this.cleanUpHistoryRepository = cleanUpHistoryRepository ?? throw new ArgumentNullException(nameof(cleanUpHistoryRepository));
             this.sentNotificationDataRepository = sentNotificationDataRepository ?? throw new ArgumentNullException(nameof(sentNotificationDataRepository));
             this.tableRowKeyGenerator = tableRowKeyGenerator ?? throw new ArgumentNullException(nameof(tableRowKeyGenerator));
             this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.logger = loggerFactory?.CreateLogger<DeleteMessagesController>() ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
         /// <summary>
@@ -97,6 +101,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 try
                 {
                     string functionUrl = "https://release8086-data-function.azurewebsites.net/api/CompanyCommunicatorDataCleanUpFunction";
+                    // string functionUrl = "https://ba87-2401-4900-1c8f-dff-e50f-7cdf-6adb-65a8.ngrok-free.app/api/CompanyCommunicatorDataCleanUpFunction";
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, functionUrl);
                     string jsonPayload = JsonConvert.SerializeObject(deleteHistoricalMessage);
                     request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -110,6 +115,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 }
                 catch (Exception ex)
                 {
+                    this.logger.LogError($"Exception in background task: {ex.Message}.");
                     await this.cleanUpHistoryRepository.CreateOrUpdateAsync(new CleanUpHistoryEntity()
                     {
                         PartitionKey = "Delete Messages",

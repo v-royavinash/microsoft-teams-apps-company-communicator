@@ -8,10 +8,10 @@ import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 
 export const DeleteMessageDetail = (deletedMessages: any) => {
-    const { t } = useTranslation();
-    const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
+  const { t } = useTranslation();
+  const keyboardNavAttr = useArrowNavigationGroup({ axis: 'grid' });
 
-    return (
+  return (
         <Table {...keyboardNavAttr} role='grid' aria-label={t('deletedMessagesGridNavigation') ?? ''}>
             <TableHeader>
                 <TableRow>
@@ -58,5 +58,5 @@ export const DeleteMessageDetail = (deletedMessages: any) => {
                 ))}
             </TableBody>
         </Table>
-    );
+  );
 };

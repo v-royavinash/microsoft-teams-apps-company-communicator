@@ -8,26 +8,21 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
-    using System.Net.Http.Json;
     using System.Text;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Graph;
-    using Microsoft.Teams.Apps.CompanyCommunicator.Authentication;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.CleanUpHistory;
-    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Models;
     using Newtonsoft.Json;
-    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Controller for older deleting messages.
     /// </summary>
-    //[Authorize(PolicyNames.MustBeValidUpnPolicy)]
     [Route("api/deletemessages")]
     public class DeleteMessagesController : Controller
     {
@@ -37,6 +32,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         private readonly IHttpClientFactory clientFactory;
         private readonly IConfiguration configuration;
         private readonly ILogger<DeleteMessagesController> logger;
+        private string dataFunctionUrl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteMessagesController"/> class.
@@ -61,6 +57,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.logger = loggerFactory?.CreateLogger<DeleteMessagesController>() ?? throw new ArgumentNullException(nameof(loggerFactory));
+            this.dataFunctionUrl = this.configuration.GetValue<string>("DataFunctionUrl", string.Empty) ?? throw new ArgumentNullException(nameof(this.dataFunctionUrl));
         }
 
         /// <summary>
@@ -100,18 +97,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             {
                 try
                 {
-                    string functionUrl = "https://release8086-data-function.azurewebsites.net/api/CompanyCommunicatorDataCleanUpFunction";
-                    // string functionUrl = "https://ba87-2401-4900-1c8f-dff-e50f-7cdf-6adb-65a8.ngrok-free.app/api/CompanyCommunicatorDataCleanUpFunction";
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, functionUrl);
-                    string jsonPayload = JsonConvert.SerializeObject(deleteHistoricalMessage);
+                    var request = new HttpRequestMessage(HttpMethod.Post, this.dataFunctionUrl);
+                    var jsonPayload = JsonConvert.SerializeObject(deleteHistoricalMessage);
                     request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
+                    // Execution of the data function will continue in background.
                     this.clientFactory.CreateClient().SendAsync(request);
-
-                    //if (!httpResponse.IsSuccessStatusCode)
-                    //{
-                    //    throw new Exception($"Failed to send HTTP PUT request to Azure Function: {httpResponse.StatusCode}");
-                    //}
                 }
                 catch (Exception ex)
                 {

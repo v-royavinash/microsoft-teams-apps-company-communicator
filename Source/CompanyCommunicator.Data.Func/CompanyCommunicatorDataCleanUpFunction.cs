@@ -13,7 +13,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.Azure.Cosmos.Table;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;

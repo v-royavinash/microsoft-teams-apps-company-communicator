@@ -7,6 +7,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Repositories.Extensions
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Models;
 
@@ -47,7 +48,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Repositories.Extensions
                 Rosters = notification.Rosters,
                 Groups = notification.Groups,
                 AllUsers = notification.AllUsers,
+                IsScheduled = notification.IsScheduled,
+                ScheduledDate = notification.ScheduledDate,
             };
+
+            if (!string.IsNullOrEmpty(notification.ImageLink) && notification.ImageLink.StartsWith(Constants.ImageBase64Format))
+            {
+                notificationEntity.ImageLink = await notificationRepository.SaveImageAsync(newId, notification.ImageLink);
+                notificationEntity.ImageBase64BlobName = newId;
+            }
+            else
+            {
+                notificationEntity.ImageLink = notification.ImageLink;
+            }
 
             await notificationRepository.CreateOrUpdateAsync(notificationEntity);
 

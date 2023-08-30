@@ -13,14 +13,18 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
     using global::Azure.Storage.Blobs;
     using global::Azure.Storage.Blobs.Models;
     using Microsoft.Bot.Builder;
+    using Microsoft.Bot.Builder.Integration.AspNet.Core;
+    using Microsoft.Bot.Connector.Authentication;
     using Microsoft.Bot.Schema;
     using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Options;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Adapter;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Clients;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.ExportData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Resources;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Secrets;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
     using Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Export.Activities;
     using Moq;
@@ -35,9 +39,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
         private readonly Mock<IStorageClientFactory> storageClientFactory = new Mock<IStorageClientFactory>();
         private readonly Mock<IUserDataRepository> userDataRepository = new Mock<IUserDataRepository>();
         private readonly Mock<IOptions<BotOptions>> botOptions = new Mock<IOptions<BotOptions>>();
-        private readonly Mock<ICCBotFrameworkHttpAdapter> botAdapter = new Mock<ICCBotFrameworkHttpAdapter>();
         private readonly Mock<IStringLocalizer<Strings>> localizer = new Mock<IStringLocalizer<Strings>>();
-        private readonly Mock<BlobContainerClient> blobContainerClient = new Mock<BlobContainerClient>();
+        private readonly Mock<CCBotAdapter> botAdapter = new Mock<CCBotAdapter>(new Mock<ICertificateProvider>().Object, new Mock<BotFrameworkAuthentication>().Object);
 
         /// <summary>
         /// Constructor test for all parameters.
@@ -48,6 +51,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
             // Arrange
             this.botOptions.Setup(x => x.Value).Returns(new BotOptions() { AuthorAppId = "AuthorAppId" });
             Action action = () => new HandleExportFailureActivity(this.exportDataRepository.Object, this.storageClientFactory.Object, this.botOptions.Object, this.botAdapter.Object, this.userDataRepository.Object, this.localizer.Object);
+
 
             // Act and Assert.
             action.Should().NotThrow();
@@ -105,7 +109,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
             var exportDataEntity = new ExportDataEntity() { FileName = null, PartitionKey = "partitionKey" };
             var userDataEntity = new UserDataEntity() { ServiceUrl = "serviceUrl", ConversationId = "conversationId" };
             var blobContainerClientmock = GetBlobContainerClientMock();
-            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient()).Returns(blobContainerClientmock.Object);
+            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient(Constants.BlobContainerName)).Returns(blobContainerClientmock.Object);
             this.userDataRepository.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(userDataEntity);
 
             // Act
@@ -127,7 +131,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
             var exportDataEntity = new ExportDataEntity() { FileName = "fileName", PartitionKey = "partitionKey" };
             var userDataEntity = new UserDataEntity() { ServiceUrl = "serviceUrl", ConversationId = "conversationId" };
             var blobContainerClientmock = GetBlobContainerClientMock();
-            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient()).Returns(blobContainerClientmock.Object);
+            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient(Constants.BlobContainerName)).Returns(blobContainerClientmock.Object);
             this.userDataRepository.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(userDataEntity);
 
             // Act
@@ -148,7 +152,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
             var activityInstance = this.GetHandleExportFailureActivity();
             var exportDataEntity = new ExportDataEntity() { FileName = null, PartitionKey = "partitionKey" };
             var userDataEntity = new UserDataEntity() { ServiceUrl = "serviceUrl", ConversationId = "conversationId" };
-            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient()).Returns(default(BlobContainerClient));
+            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient(Constants.BlobContainerName)).Returns(default(BlobContainerClient));
             this.userDataRepository.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(userDataEntity);
             string failureText = "ExportFailureText";
             var exportFailureString = new LocalizedString(failureText, failureText);
@@ -173,7 +177,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Test.Export.Activit
             var activityInstance = this.GetHandleExportFailureActivity();
             var exportDataEntity = new ExportDataEntity() { FileName = null, PartitionKey = "partitionKey" };
             var userDataEntity = new UserDataEntity() { ServiceUrl = "serviceUrl", ConversationId = "conversationId" };
-            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient()).Returns(default(BlobContainerClient));
+            this.storageClientFactory.Setup(x => x.CreateBlobContainerClient(Constants.BlobContainerName)).Returns(default(BlobContainerClient));
             this.userDataRepository.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(userDataEntity);
             string failureText = "ExportFailureText";
             var exportFailureString = new LocalizedString(failureText, failureText);

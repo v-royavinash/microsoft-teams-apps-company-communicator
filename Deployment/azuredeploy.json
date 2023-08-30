@@ -61,6 +61,13 @@
         "description": "Semicolon-delimited list of the user principal names (UPNs) allowed to send messages."
       }
     },
+    "deleteAdminUPNList": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Semicolon-delimited list of the user principal names (UPNs) allowed to delete historical messages."
+      }
+    },
     "ProactivelyInstallUserApp": {
       "defaultValue": true,
       "type": "Bool",
@@ -109,10 +116,10 @@
     "customDomainOption": {
       "type": "string",
       "allowedValues": [
-        "Custom domain name (recommended)",
-        "Azure Front Door"
+        "Custom domain name",
+        "Azure Front Door (recommended)"
       ],
-      "defaultValue": "Azure Front Door",
+      "defaultValue": "Azure Front Door (recommended)",
       "metadata": {
         "description": "How the app will be hosted on a domain that is not *.azurewebsites.net. Azure Front Door is an easy option that the template can set up automatically, but it comes with ongoing monthly costs. "
       }
@@ -139,6 +146,22 @@
       "defaultValue": "https://raw.githubusercontent.com/OfficeDev/microsoft-teams-company-communicator-app/main/Manifest/color.png",
       "metadata": {
         "description": "The link to the icon for the app. It must resolve to a PNG file."
+      }
+    },
+    "headerText": {
+      "type": "string",
+      "defaultValue": "Company Communicator",
+      "minLength": 1,
+      "metadata": {
+        "description": "The header banner text."
+      }
+    },
+    "headerLogoUrl": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "https://raw.githubusercontent.com/OfficeDev/microsoft-teams-company-communicator-app/main/Source/CompanyCommunicator/ClientApp/src/assets/Images/mslogo.png",
+      "metadata": {
+        "description": "The link to the logo for the app. It must resolve to a PNG file."
       }
     },
     "tenantId": {
@@ -277,7 +300,7 @@
     ],
     "isSharedPlan": "[contains(variables('sharedSkus'), parameters('hostingPlanSku'))]",
     "skuFamily": "[if(equals(parameters('hostingPlanSku'), 'Shared'), 'D', take(parameters('hostingPlanSku'), 1))]",
-    "useFrontDoor": "[equals(parameters('customDomainOption'), 'Azure Front Door')]",
+    "useFrontDoor": "[equals(parameters('customDomainOption'), 'Azure Front Door (recommended)')]",
     "frontDoorName": "[parameters('baseResourceName')]",
     "frontDoorDomain": "[toLower(concat(variables('frontDoorName'), '.azurefd.net'))]",
     "ProactivelyInstallUserApp": "[parameters('ProactivelyInstallUserApp')]",
@@ -300,7 +323,8 @@
     "AppInsightsSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('AppInsightsSecretName'))]",
     "UserAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('UserAppSecretName'))]",
     "AuthorAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('AuthorAppSecretName'))]",
-    "GraphAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('GraphAppSecretName'))]"
+    "GraphAppSecretResourceId": "[resourceId(resourceGroup().name, 'Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('GraphAppSecretName'))]",
+    "netFrameworkVersion": "v6.0"
   },
   "resources": [
     {
@@ -555,7 +579,14 @@
             "allowedOrigins": [
               "[concat('https://', variables('frontDoorDomain'))]"
             ]
-          }
+          },
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "dotnet"
+            }
+          ],
+          "netFrameworkVersion": "v6.0.100"
         }
       },
       "dependsOn": [
@@ -603,14 +634,21 @@
             "AllowedTenants": "[parameters('tenantId')]",
             "DisableTenantFilter": "false",
             "AuthorizedCreatorUpns": "[parameters('senderUPNList')]",
+            "AuthorizedDeleteUpns": "[parameters('deleteAdminUPNList')]",
             "UseCertificate": "false",
             "DisableAuthentication": "false",
             "DisableCreatorUpnCheck": "false",
+            "DisableDeleteUpnCheck": "false",
             "WEBSITE_LOAD_CERTIFICATES": "*",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('AppInsightsSecretResourceId'), '2015-06-01').secretUriWithVersion, ')')]",
             "WEBSITE_NODE_DEFAULT_VERSION": "16.13.0",
+            "WEBSITE_NPM_DEFAULT_VERSION": "8.19.2",
             "KeyVault:Url": "[variables('keyVaultUrl')]",
-            "DOTNET_ADD_GLOBAL_TOOLS_TO_PATH": "false"
+            "DOTNET_ADD_GLOBAL_TOOLS_TO_PATH": "false",
+            "REACT_APP_HEADERTEXT": "[parameters('headerText')]",
+            "REACT_APP_HEADERIMAGE": "[parameters('headerLogoUrl')]",
+            "REACT_APP_AUTHORIZED_USERS_EMAIL": "[parameters('deleteAdminUPNList')]",
+            "DataFunctionUrl": "[concat('https://', variables('dataFunctionAppName'), '.azurewebsites.net/api/CompanyCommunicatorDataCleanUpFunction')]"
           }
         },
         {
@@ -647,7 +685,8 @@
         "httpsOnly": true,
         "siteConfig": {
           "ftpsState": "Disabled",
-          "alwaysOn": "[not(variables('isSharedPlan'))]"
+          "alwaysOn": "[not(variables('isSharedPlan'))]",
+          "netFrameworkVersion": "[variables('netFrameworkVersion')]"
         }
       },
       "dependsOn": [
@@ -691,7 +730,7 @@
             "KeyVault:Url": "[variables('keyVaultUrl')]",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('StorageAccountSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "FUNCTIONS_EXTENSION_VERSION": "~4",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "WEBSITE_CONTENTSHARE": "[toLower(variables('prepFunctionAppName'))]",
@@ -735,7 +774,8 @@
         "httpsOnly": true,
         "siteConfig": {
           "ftpsState": "Disabled",
-          "alwaysOn": "[not(variables('isSharedPlan'))]"
+          "alwaysOn": "[not(variables('isSharedPlan'))]",
+          "netFrameworkVersion": "[variables('netFrameworkVersion')]"
         }
       },
       "dependsOn": [
@@ -774,7 +814,7 @@
             "KeyVault:Url": "[variables('keyVaultUrl')]",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('StorageAccountSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "FUNCTIONS_EXTENSION_VERSION": "~4",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "WEBSITE_CONTENTSHARE": "[toLower(variables('sendFunctionAppName'))]",
@@ -816,7 +856,8 @@
         "httpsOnly": true,
         "siteConfig": {
           "ftpsState": "Disabled",
-          "alwaysOn": "[not(variables('isSharedPlan'))]"
+          "alwaysOn": "[not(variables('isSharedPlan'))]",
+          "netFrameworkVersion": "[variables('netFrameworkVersion')]"
         }
       },
       "dependsOn": [
@@ -856,7 +897,7 @@
             "KeyVault:Url": "[variables('keyVaultUrl')]",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('StorageAccountSecretResourceId'),'2015-06-01').secretUriWithVersion, ')')]",
-            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "FUNCTIONS_EXTENSION_VERSION": "~4",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]",
             "WEBSITE_CONTENTSHARE": "[toLower(variables('dataFunctionAppName'))]",
@@ -888,7 +929,6 @@
       "name": "[variables('keyvaultName')]",
       "apiVersion": "2016-10-01",
       "location": "[parameters('location')]",
-
       "tags": {
         "displayName": "KeyVault"
       },

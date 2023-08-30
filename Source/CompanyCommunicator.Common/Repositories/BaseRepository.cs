@@ -171,6 +171,22 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories
         }
 
         /// <inheritdoc/>
+        public async Task<IEnumerable<T>> GetAllDeleteAsync(string partition = null, int? count = null)
+        {
+            try
+            {
+                var query = new TableQuery<T>();
+                var entities = await this.ExecuteQueryAsync(query);
+                return entities;
+            }
+            catch (Exception ex)
+            {
+                this.Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task<(IEnumerable<T>, TableContinuationToken)> GetPagedAsync(string partition = null, int? count = null, TableContinuationToken token = null)
         {
             var partitionKeyFilter = this.GetPartitionKeyFilter(partition);
@@ -188,9 +204,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<T>> GetAllLessThanDateTimeAsync(DateTime dateTime)
+        public async Task<IEnumerable<T>> GetAllBetweenDateTimesAsync(DateTime startDateTime, DateTime endDateTime)
         {
-            var filterByDate = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, dateTime);
+            var filterByDate = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterConditionForDate(
+                    "Timestamp", QueryComparisons.LessThanOrEqual, startDateTime), TableOperators.And,
+                TableQuery.GenerateFilterConditionForDate(
+                    "Timestamp", QueryComparisons.GreaterThanOrEqual, endDateTime));
 
             var query = new TableQuery<T>().Where(filterByDate);
 

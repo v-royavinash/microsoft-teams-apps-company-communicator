@@ -28,6 +28,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public string ImageLink { get; set; }
 
         /// <summary>
+        /// Gets or sets the blob name for the image in base64 format.
+        /// </summary>
+        public string ImageBase64BlobName { get; set; }
+
+        /// <summary>
         /// Gets or sets the Summary value.
         /// </summary>
         public string Summary { get; set; }
@@ -51,5 +56,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets the Created DateTime value.
         /// </summary>
         public DateTime CreatedDateTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether gets or sets the IsScheduled value.
+        /// </summary>
+        public bool IsScheduled { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Export.Activities
     using Microsoft.Bot.Schema;
     using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Options;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Adapter;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Clients;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.ExportData;
@@ -33,7 +34,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Export.Activities
         private readonly IStorageClientFactory storageClientFactory;
         private readonly IUserDataRepository userDataRepository;
         private readonly string authorAppId;
-        private readonly ICCBotFrameworkHttpAdapter botAdapter;
+        private readonly CCBotAdapterBase botAdapter;
         private readonly IStringLocalizer<Strings> localizer;
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Export.Activities
             IExportDataRepository exportDataRepository,
             IStorageClientFactory storageClientFactory,
             IOptions<BotOptions> botOptions,
-            ICCBotFrameworkHttpAdapter botAdapter,
+            CCBotAdapterBase botAdapter,
             IUserDataRepository userDataRepository,
             IStringLocalizer<Strings> localizer)
         {
@@ -89,7 +90,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Export.Activities
                 return;
             }
 
-            var blobContainerClient = this.storageClientFactory.CreateBlobContainerClient();
+            var blobContainerClient = this.storageClientFactory.CreateBlobContainerClient(Constants.BlobContainerName);
 
             await blobContainerClient.CreateIfNotExistsAsync();
             await blobContainerClient
@@ -113,7 +114,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.Export.Activities
 
             int maxNumberOfAttempts = 10;
             await this.botAdapter.ContinueConversationAsync(
-               botId: this.authorAppId,
+               botAppId: this.authorAppId,
                reference: conversationReference,
                callback: async (turnContext, cancellationToken) =>
                {

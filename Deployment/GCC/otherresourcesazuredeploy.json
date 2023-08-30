@@ -53,6 +53,13 @@
             "description":"Semicolon-delimited list of the user principal names (UPNs) allowed to send messages."
          }
       },
+      "deleteAdminUPNList": {
+        "type": "string",
+        "minLength": 1,
+        "metadata": {
+          "description": "Semicolon-delimited list of the user principal names (UPNs) allowed to delete historical messages."
+        }
+      },
       "ProactivelyInstallUserApp":{
          "defaultValue": true,
          "type":"Bool",
@@ -308,12 +315,20 @@
                      "value":"[parameters('senderUPNList')]"
                   },
                   {
+                     "name":"AuthorizedDeleteUpns",
+                     "value":"[parameters('deleteAdminUPNList')]"
+                  },
+                  {
                      "name":"DisableAuthentication",
                      "value":"false"
                   },
                   {
                      "name":"DisableCreatorUpnCheck",
                      "value":"false"
+                  },
+                  {
+                    "name": "DisableDeleteUpnCheck",
+                    "value":"false"
                   },
                   {
                      "name":"APPINSIGHTS_INSTRUMENTATIONKEY",

@@ -180,6 +180,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                     TotalMessageCount = notificationEntity.TotalMessageCount,
                     SendingStartedDate = notificationEntity.SendingStartedDate,
                     Status = notificationEntity.GetStatus(),
+                    CreatedBy = notificationEntity.CreatedBy,
                 };
 
                 result.Add(summary);
@@ -222,6 +223,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 Id = notificationEntity.Id,
                 Title = notificationEntity.Title,
                 ImageLink = notificationEntity.ImageLink,
+                ImageBase64BlobName = notificationEntity.ImageBase64BlobName,
                 Summary = notificationEntity.Summary,
                 Author = notificationEntity.Author,
                 ButtonTitle = notificationEntity.ButtonTitle,
@@ -241,7 +243,15 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 WarningMessage = notificationEntity.WarningMessage,
                 CanDownload = userNotificationDownload == null,
                 SendingCompleted = notificationEntity.IsCompleted(),
+                CreatedBy = notificationEntity.CreatedBy,
             };
+
+            // In case we have blob name instead of URL to public image.
+            if (!string.IsNullOrEmpty(notificationEntity.ImageBase64BlobName)
+                && result.ImageLink.StartsWith(Common.Constants.ImageBase64Format))
+            {
+                result.ImageLink = await this.notificationDataRepository.GetImageAsync(result.ImageLink, notificationEntity.ImageBase64BlobName);
+            }
 
             return this.Ok(result);
         }

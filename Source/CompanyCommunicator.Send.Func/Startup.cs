@@ -13,15 +13,20 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
     using Microsoft.Azure.Functions.Extensions.DependencyInjection;
     using Microsoft.Bot.Builder.Integration.AspNet.Core;
     using Microsoft.Bot.Connector.Authentication;
+    using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Adapter;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Clients;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Secrets;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Blob;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.DataQueue;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.PrepareToSendQueue;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.SendQueue;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams;
     using Microsoft.Teams.Apps.CompanyCommunicator.Send.Func.Services;
@@ -81,9 +86,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
             // Add bot services.
             builder.Services.AddSingleton<UserAppCredentials>();
-            builder.Services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
-            builder.Services.AddSingleton<ICCBotFrameworkHttpAdapter, CCBotFrameworkHttpAdapter>();
-            builder.Services.AddSingleton<BotFrameworkHttpAdapter>();
+            builder.Services.AddSingleton<ServiceClientCredentialsFactory, ConfigurationCredentialProvider>();
+            builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
+            builder.Services.AddSingleton<CCBotAdapterBase, CCBotAdapter>();
 
             // Add teams services.
             builder.Services.AddTransient<IMessageService, MessageService>();
@@ -93,12 +98,20 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             builder.Services.AddSingleton<IGlobalSendingNotificationDataRepository, GlobalSendingNotificationDataRepository>();
             builder.Services.AddSingleton<ISentNotificationDataRepository, SentNotificationDataRepository>();
             builder.Services.AddSingleton<INotificationDataRepository, NotificationDataRepository>();
+            builder.Services.AddSingleton<IPrepareToSendQueue, PrepareToSendQueue>();
+            builder.Services.AddSingleton<IDataQueue, DataQueue>();
 
             // Add service bus message queues.
             builder.Services.AddSingleton<ISendQueue, SendQueue>();
 
             // Add the Notification service.
             builder.Services.AddTransient<INotificationService, NotificationService>();
+            builder.Services.AddTransient<IStorageClientFactory, StorageClientFactory>();
+            builder.Services.AddTransient<IBlobStorageProvider, BlobStorageProvider>();
+            builder.Services.AddTransient<TableRowKeyGenerator>();
+
+            // Add the cache services
+            builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
 
             // Add Secrets.
             var keyVaultUrl = Environment.GetEnvironmentVariable("KeyVault:Url");

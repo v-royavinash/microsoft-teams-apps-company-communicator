@@ -16,15 +16,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Adapter;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Clients;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.CleanUpHistory;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.ExportData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Secrets;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Blob;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.DataQueue;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Data.Func.Services.DataCleanUpServices;
     using Microsoft.Teams.Apps.CompanyCommunicator.Data.Func.Services.FileCardServices;
     using Microsoft.Teams.Apps.CompanyCommunicator.Data.Func.Services.NotificationDataServices;
 
@@ -56,7 +60,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
                    botOptions.UserAppPassword = configuration.GetValue<string>("UserAppPassword", string.Empty);
                    botOptions.UserAppCertName = configuration.GetValue<string>("UserAppCertName", string.Empty);
                    botOptions.AuthorAppId = configuration.GetValue<string>("AuthorAppId");
-                   botOptions.AuthorAppCertName = configuration.GetValue<string>("AuthorAppPassword", string.Empty);
+                   botOptions.AuthorAppPassword = configuration.GetValue<string>("AuthorAppPassword", string.Empty);
                    botOptions.AuthorAppCertName = configuration.GetValue<string>("AuthorAppCertName", string.Empty);
                    botOptions.GraphAppId = configuration.GetValue<string>("GraphAppId");
                    botOptions.GraphAppCertName = configuration.GetValue<string>("GraphAppCertName", string.Empty);
@@ -92,9 +96,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
 
             // Add bot services.
             builder.Services.AddSingleton<UserAppCredentials>();
-            builder.Services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
-            builder.Services.AddSingleton<ICCBotFrameworkHttpAdapter, CCBotFrameworkHttpAdapter>();
-            builder.Services.AddSingleton<BotFrameworkHttpAdapter>();
+            builder.Services.AddSingleton<ServiceClientCredentialsFactory, ConfigurationCredentialProvider>();
+            builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
+            builder.Services.AddSingleton<CCBotAdapterBase, CCBotAdapter>();
 
             // Add Secrets.
             var keyVaultUrl = Environment.GetEnvironmentVariable("KeyVault:Url");
@@ -106,15 +110,21 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Data.Func
             // Add notification data services.
             builder.Services.AddTransient<AggregateSentNotificationDataService>();
             builder.Services.AddTransient<UpdateNotificationDataService>();
+            builder.Services.AddTransient<IPartitionKeyHandler, PartitionKeyHandlerService>();
 
             // Add repositories.
             builder.Services.AddSingleton<INotificationDataRepository, NotificationDataRepository>();
             builder.Services.AddSingleton<ISentNotificationDataRepository, SentNotificationDataRepository>();
             builder.Services.AddSingleton<IUserDataRepository, UserDataRepository>();
             builder.Services.AddSingleton<IExportDataRepository, ExportDataRepository>();
+            builder.Services.AddSingleton<ICleanUpHistoryRepository, CleanUpHistoryRepository>();
+            builder.Services.AddTransient<TableRowKeyGenerator>();
 
             // Add service bus message queues.
             builder.Services.AddSingleton<IDataQueue, DataQueue>();
+
+            builder.Services.AddTransient<IBlobStorageProvider, BlobStorageProvider>();
+            builder.Services.AddTransient<IStorageClientFactory, StorageClientFactory>();
         }
     }
 }

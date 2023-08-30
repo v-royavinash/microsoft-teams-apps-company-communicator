@@ -10,7 +10,7 @@
 
 # Prerequisites
 To begin, you will need:  
-
+* An Azure CLI need to be installed. If the azure cli is not installed, please click [here](https://azcliprod.blob.core.windows.net/msi/azure-cli-2.49.0.msi) 
 * An Azure subscription where you can create the following kinds of resources:
     * App Service
     * App Service Plan
@@ -37,7 +37,6 @@ To begin, you will need:
 ## 1. Deploy to your Azure subscription
 
   Please follow below steps to deploy app template:
-
 - Download the whole solution folder from [GitHub](https://github.com/OfficeDev/microsoft-teams-company-communicator-app)
 - Unzip the Content to a folder. (say companyCommunicator)
 - Open a PowerShell window in **administrator** mode and navigate to the folder where you unzipped the content.
@@ -45,7 +44,13 @@ To begin, you will need:
     ```  
     cd microsoft-teams-apps-company-communicator-main\Deployment
     ```
+- Run the below command to check if the required azure cli version is installed or not.
+    ```
+    az --version
+    ```
+- If az is not installed, you can install [azure cli](https://azcliprod.blob.core.windows.net/msi/azure-cli-2.49.0.msi).
 
+    >**Note** : Restart the Powershell after Azure CLI is installed. If it is already installed, make sure its `v2.49.0` or later.
 - Run the below command to check if jq is installed or not.
     ```
     jq --version
@@ -137,7 +142,8 @@ To begin, you will need:
     - `appDisplayName` - The app (and bot) display name. Default value:Company Communicator.
     - `appDescription` - The app (and bot) description. Default value: Broadcast messages to multiple teams and people in one go.
     - `appIconUrl` - The link to the icon for the app. It must resolve to a PNG file. Default value [https://raw.githubusercontent.com/OfficeDev/microsoft-teams-company-communicator-app/main/Manifest/color.png](https://raw.githubusercontent.com/OfficeDev/microsoft-teams-company-communicator-app/main/Manifest/color.png)
-
+    - `Header Text` - Default value is `Company Communicator`. This is the banner text that will appear starting v5.2 and later, you will have the option to modify later.
+    - `Header Logo Url` - Default image is Microsoft logo. You will have the option to modify later.
     - `companyName` - The display name for the company.
     - `websiteUrl` - The https:// URL to you company's website. This link should take users to your company or product-specific landing page.
     - `privacyUrl` - The https:// URL to the company's privacy policy.
@@ -165,7 +171,7 @@ To begin, you will need:
 - If the azure CLI application is already installed, the script will check if the following modules are installed.
   ![Powershell deployment guide](images/check_modules.png)
 
-> Note: The script requires Azure CLI `v.2.2` or later. The script will install Azure CLI if its not already installed. If it is already installed, make sure its `v2.2` or later.
+> Note: The script requires Azure CLI `v.2.49.0` or later. The script will install Azure CLI if its not already installed. If it is already installed, make sure its `v2.49.0` or later.
 
 - The script will prompt *twice* for authentication during execution, once to get access to the Azure subscription, and the other to get access to Azure Active Directory. Please login using an account that has **contributor** role or higher.
 

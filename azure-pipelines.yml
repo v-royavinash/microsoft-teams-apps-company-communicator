@@ -1,6 +1,6 @@
 pool:
   name: Azure Pipelines
-  vmImage: 'windows-latest'
+  vmImage: 'windows-2022'
   demands:
   - msbuild
   - visualstudio
@@ -13,17 +13,39 @@ variables:
 steps:
 - checkout: self
 
-- task: UseDotNet@2 
-  displayName: '.NET Core 3.1.x'
+- task: NodeTool@0
+  displayName: 'Use Node =16.x'
   inputs:
-    version: '3.1.x'
+    versionSpec: '=16.x'
+
+- task: Npm@1
+  displayName: 'npm install'
+  inputs:
+    command: custom
+    workingDir: Source\CompanyCommunicator\ClientApp
+    verbose: false
+    customCommand: 'install --save --legacy-peer-deps'
+
+- task: Npm@1
+  displayName: 'npm build'
+  inputs:
+    command: custom
+    workingDir: Source\CompanyCommunicator\ClientApp
+    verbose: false
+    customCommand: 'run build'
+- task: UseDotNet@2 
+  displayName: 'Use .NET 6.0.x'
+  inputs:
     packageType: sdk
+    version: '6.0.x'
+    includePreviewVersions: true
 
 - task: DotNetCoreCLI@2
-  displayName: Build solution
+  displayName: 'Build solution'
   inputs:
+    command: build
     projects: $(Solution)
-    arguments: --configuration $(BuildConfiguration)
+    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Run unit tests'
@@ -31,7 +53,7 @@ steps:
     command: test
     projects: $(Solution)
     arguments: '--collect "Code coverage"'
-    
+
 - task: DotNetCoreCLI@2
   displayName: 'Publish Company Communicator'
   inputs:
@@ -76,13 +98,18 @@ steps:
     msBuildCommandline: '$(Agent.ToolsDirectory)\dotnet\dotnet.exe build $(Solution) --configuration $(BuildConfiguration)'
     rulesetName: 'Skype'
 
-- task: TSLint@1
-  displayName: Run TSLint
+- task: ESLint@1
+  displayName: 'Run ESLint'
   inputs:
-    RuleLibrary: microsoft
-    RulesetMicrosoft: skypesdlrequired
-    FileSelectionType: projectFile
-    Project: Source/CompanyCommunicator/ClientApp/tsconfig.json
+    Configuration: required
+    EnableExclusions: true
+    ExclusionPatterns: |
+     *.d.ts
+     *.spec.js
+     *.spec.jsx
+     *.spec.ts
+     *.spec.tsx
+    TargetsESLint: $(Build.SourcesDirectory)/Source/CompanyCommunicator/ClientApp/src/**/*.{js,ts, jsx, tsx}  
   
 - task: PoliCheck@1
   displayName: 'Run Policheck'
@@ -104,7 +131,7 @@ steps:
     PoliCheckBreakOn: 'Severity1'
     RoslynAnalyzersBreakOn: 'Error'
     SemmleBreakOn: 'Error'
-    TSLintBreakOn: 'Error'
+    ESLintBreakOn: 'Error'
     ToolLogsNotFoundAction: 'Standard'
 
 - task: PostAnalysis@1
@@ -118,7 +145,7 @@ steps:
     PoliCheckBreakOn: 'Severity1'
     RoslynAnalyzersBreakOn: 'Error'
     SemmleBreakOn: 'Error'
-    TSLintBreakOn: 'Error'
+    ESLintBreakOn: 'Error'
     ToolLogsNotFoundAction: 'Standard'
 
 - task: PublishSecurityAnalysisLogs@2

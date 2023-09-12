@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Configuration
+namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Configuration
 {
     /// <summary>
     /// App configuration for GCCH environment.
